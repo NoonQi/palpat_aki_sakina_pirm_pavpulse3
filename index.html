@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIRM Admin Console — Potholes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  body { margin: 0; background: #e9e7e0; padding: 20px; }
+  #pirm-admin-root {
+    --asphalt: #24262b; --asphalt-soft: #3a3d44; --paper: #f6f4ee; --paper-line: #e4e0d6;
+    --safety-orange: #e8590c; --route-blue: #1971c2; --fixed-green: #2f9e44; --caution-yellow: #f5b700;
+    --rejected-red: #c92a2a; --sev-critical: #e03131; --sev-high: #f08c00; --sev-medium: #f5b700; --sev-low: #868e96;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--paper); color: var(--asphalt); padding: 28px 22px 60px; border-radius: 10px;
+    max-width: 960px; margin: 0 auto; box-sizing: border-box; position: relative;
+  }
+  #pirm-admin-root * { box-sizing: border-box; }
+  .pirm-display { font-family: 'Oswald', 'Arial Narrow', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .pirm-login-wrap { max-width: 380px; margin: 40px auto; background: var(--asphalt); color: var(--paper); border-radius: 10px; padding: 32px 28px; text-align: center; }
+  .pirm-login-badge { width: 52px; height: 52px; border-radius: 8px; background: var(--safety-orange); display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px; }
+  .pirm-login-wrap h2 { margin: 0 0 4px; font-size: 20px; }
+  .pirm-login-wrap p { font-size: 12.5px; color: #b8bac0; margin: 0 0 20px; }
+  .pirm-login-wrap input { width: 100%; font-family: inherit; font-size: 13px; padding: 10px 12px; margin-bottom: 10px; border: none; border-radius: 6px; background: #fff; color: var(--asphalt); }
+  .pirm-login-btn { width: 100%; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--safety-orange); color: #fff; border: none; padding: 11px; border-radius: 6px; cursor: pointer; margin-top: 4px; }
+  .pirm-login-error { color: #ff8787; font-size: 12px; margin-top: 10px; min-height: 14px; }
+  .pirm-login-hint { font-size: 11px; color: #7c7f87; margin-top: 16px; border-top: 1px solid #3a3d44; padding-top: 14px; }
+
+  .pirm-header { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 4px solid var(--asphalt); padding-bottom: 14px; margin-bottom: 22px; flex-wrap: wrap; gap: 10px; }
+  .pirm-header-left { display: flex; align-items: center; gap: 12px; }
+  .pirm-badge-icon { width: 42px; height: 42px; border-radius: 6px; background: var(--safety-orange); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; box-shadow: 3px 3px 0 var(--asphalt); }
+  .pirm-title { font-size: 24px; font-weight: 600; margin: 0; line-height: 1; }
+  .pirm-subtitle { font-size: 12.5px; color: var(--asphalt-soft); margin-top: 4px; font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
+  .pirm-header-right { display: flex; align-items: center; gap: 10px; }
+  .pirm-live-tag { font-size: 11px; font-weight: 700; color: #fff; background: var(--fixed-green); padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; }
+  .pirm-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pirm-pulse 1.6s infinite; }
+  @keyframes pirm-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .pirm-logout-btn { font-family: inherit; font-size: 11.5px; font-weight: 700; background: none; border: 2px solid var(--asphalt); color: var(--asphalt); padding: 5px 12px; border-radius: 20px; cursor: pointer; }
+
+  .pirm-form-section { background: var(--asphalt); color: var(--paper); border-radius: 8px; padding: 18px 18px 20px; margin-bottom: 26px; }
+  .pirm-form-heading { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+  .pirm-form-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .pirm-form-grid input[type="text"], .pirm-form-grid select { width: 100%; font-family: inherit; font-size: 13px; padding: 9px 11px; border: none; border-radius: 6px; background: #fff; color: var(--asphalt); }
+  .pirm-form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .pirm-upload-box, .pirm-geo-box { border: 2px dashed #565962; border-radius: 6px; padding: 10px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.04); }
+  .pirm-upload-box input[type="file"] { font-size: 11px; color: var(--paper); flex: 1; }
+  .pirm-preview-thumb { width: 40px; height: 40px; border-radius: 5px; object-fit: cover; flex-shrink: 0; display: none; }
+  .pirm-geo-btn { font-family: inherit; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; background: var(--safety-orange); color: #fff; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .pirm-geo-status { font-size: 11.5px; color: #c9cbd1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pirm-submit-btn { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--fixed-green); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+  .pirm-form-note { font-size: 11px; color: #9a9ca3; margin-top: 8px; }
+
+  .pirm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .pirm-stat { background: var(--asphalt); color: var(--paper); border-radius: 8px; padding: 14px 16px; position: relative; overflow: hidden; }
+  .pirm-stat::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--stat-color, var(--safety-orange)); }
+  .pirm-stat-num { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 600; line-height: 1; }
+  .pirm-stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #b8bac0; margin-top: 4px; }
+
+  .pirm-analytics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
+  .pirm-chart-card { background: #fff; border: 2px solid var(--asphalt); border-radius: 8px; padding: 14px; }
+  .pirm-chart-title { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--asphalt-soft); margin-bottom: 8px; }
+  .pirm-chart-card canvas { max-height: 160px; }
+
+  .pirm-controls { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+  .pirm-controls input, .pirm-controls select { font-family: inherit; font-size: 13px; padding: 8px 12px; border: 2px solid var(--asphalt); border-radius: 6px; background: #fff; color: var(--asphalt); }
+  .pirm-controls input { flex: 1; min-width: 160px; }
+  .pirm-result-count { font-size: 12px; color: var(--asphalt-soft); margin-left: auto; }
+
+  .pirm-list { display: flex; flex-direction: column; gap: 14px; }
+  .pirm-card { background: #fff; border: 2px solid var(--asphalt); border-radius: 8px; display: grid; grid-template-columns: 90px 1fr auto; gap: 16px; padding: 14px; position: relative; align-items: center; cursor: pointer; }
+  .pirm-card:hover { background: #fcfbf8; }
+  .pirm-card.pirm-rejected { opacity: 0.6; }
+  .pirm-card::before { content: ''; position: absolute; left: 106px; top: 0; bottom: 0; width: 0; border-left: 2px dashed var(--paper-line); }
+  .pirm-photo { width: 90px; height: 74px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; flex-shrink: 0; background-size: cover; background-position: center; }
+  .pirm-card-main { min-width: 0; }
+  .pirm-card-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .pirm-card-title { font-weight: 600; font-size: 15px; }
+  .pirm-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 20px; color: #fff; white-space: nowrap; }
+  .pirm-meta { font-size: 12px; color: var(--asphalt-soft); display: flex; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
+
+  .pirm-track { display: flex; align-items: center; margin-top: 10px; max-width: 260px; }
+  .pirm-track-seg { flex: 1; height: 4px; background: var(--paper-line); }
+  .pirm-track-seg.filled { background: var(--asphalt); }
+  .pirm-track-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--paper-line); border: 2px solid var(--asphalt); flex-shrink: 0; z-index: 1; }
+  .pirm-track-dot.active { background: var(--safety-orange); }
+  .pirm-track-dot.done { background: var(--fixed-green); }
+  .pirm-track-labels { display: flex; justify-content: space-between; max-width: 260px; margin-top: 3px; }
+  .pirm-track-labels span { font-size: 9px; color: var(--asphalt-soft); text-transform: uppercase; width: 60px; text-align: center; }
+  .pirm-track-labels span:first-child { text-align: left; width: 40px; }
+  .pirm-track-labels span:last-child { text-align: right; width: 40px; }
+
+  .pirm-card-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .pirm-upvote { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; color: var(--asphalt); background: var(--paper); border: 2px solid var(--asphalt); border-radius: 20px; padding: 4px 12px; cursor: pointer; font-family: inherit; }
+  .pirm-upvote.voted { background: var(--safety-orange); color: #fff; border-color: var(--safety-orange); }
+  .pirm-view-btn { font-family: inherit; font-size: 11px; font-weight: 700; text-transform: uppercase; background: var(--asphalt); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+  .pirm-empty { text-align: center; padding: 40px 20px; color: var(--asphalt-soft); font-size: 13px; }
+
+  .pirm-modal-overlay { position: fixed; inset: 0; background: rgba(20,20,22,0.65); display: none; align-items: center; justify-content: center; z-index: 999; padding: 20px; }
+  .pirm-modal-overlay.open { display: flex; }
+  .pirm-modal { background: #fff; border-radius: 10px; max-width: 480px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 22px; position: relative; }
+  .pirm-modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--asphalt-soft); }
+  .pirm-modal-photo { width: 100%; height: 180px; border-radius: 8px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; margin-bottom: 14px; }
+  .pirm-modal h3 { margin: 0 0 6px; font-size: 18px; }
+  .pirm-modal-desc { font-size: 13px; color: var(--asphalt-soft); margin-bottom: 10px; }
+  .pirm-modal-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 14px; }
+  .pirm-modal-meta-grid div { background: var(--paper); border-radius: 6px; padding: 8px 10px; }
+  .pirm-modal-meta-grid b { display: block; font-size: 9.5px; text-transform: uppercase; color: var(--asphalt-soft); margin-bottom: 2px; }
+  .pirm-modal label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--asphalt-soft); display: block; margin-bottom: 5px; margin-top: 12px; }
+  .pirm-modal select, .pirm-modal textarea { width: 100%; font-family: inherit; font-size: 13px; padding: 9px 11px; border: 2px solid var(--paper-line); border-radius: 6px; }
+  .pirm-modal textarea { resize: vertical; min-height: 60px; }
+  .pirm-rejected-banner { background: var(--rejected-red); color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 6px 10px; border-radius: 6px; margin-bottom: 10px; }
+  .pirm-modal-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .pirm-modal-btn { font-family: inherit; font-size: 12.5px; font-weight: 700; padding: 9px 14px; border-radius: 6px; border: none; cursor: pointer; flex: 1; }
+  .pirm-btn-save { background: var(--asphalt); color: #fff; }
+  .pirm-btn-reject { background: var(--rejected-red); color: #fff; }
+  .pirm-btn-unreject { background: var(--route-blue); color: #fff; }
+  .pirm-btn-delete { background: #fff; color: var(--rejected-red); border: 2px solid var(--rejected-red); }
+
+  @media (max-width: 700px) { .pirm-analytics { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) {
+    .pirm-form-grid, .pirm-form-row2, .pirm-modal-meta-grid { grid-template-columns: 1fr; }
+    .pirm-card { grid-template-columns: 60px 1fr; }
+    .pirm-card::before { left: 76px; }
+    .pirm-photo { width: 60px; height: 54px; font-size: 18px; }
+    .pirm-card-actions { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; margin-top: 6px; }
+  }
+</style>
+</head>
+<body>
+<div id="pirm-admin-root"></div>
+
+<script>
+(function() {
+  const STATUSES = ['Reported', 'Acknowledged', 'Fixed'];
+  const SEVERITIES = ['Low', 'Medium', 'High', 'Critical'];
+  const SEVERITY_COLOR = { Low: 'var(--sev-low)', Medium: 'var(--sev-medium)', High: 'var(--sev-high)', Critical: 'var(--sev-critical)' };
+  const ROAD_TYPES = ['Highway', 'Main Road', 'Residential Street', 'Service Lane'];
+  const ADMIN_USER = 'admin';
+  const ADMIN_PASS = 'admin123';
+
+  let isLoggedIn = false;
+  let loginError = '';
+
+  let reports = [
+    { id: 'PIRM-101', title: 'Deep pothole blocking left lane', description: 'A large pothole roughly 2 feet wide has formed near the signal, forcing vehicles to swerve into oncoming traffic.', severity: 'Critical', roadType: 'Main Road', status: 'Reported', rejected: false, location: 'MG Road, near Deccan signal', upvotes: 42, date: '2 days ago', photo: null, notes: '' },
+    { id: 'PIRM-106', title: 'Cracked road surface, cyclists at risk', description: 'Long cracks running along the service lane are catching bicycle tires, causing near-falls.', severity: 'High', roadType: 'Service Lane', status: 'Acknowledged', rejected: false, location: 'Baner Road service lane', upvotes: 33, date: '5 days ago', photo: null, notes: '' },
+    { id: 'PIRM-110', title: 'Pothole cluster, 4 reports in same block', description: 'Multiple potholes reported within the same stretch, suggesting a resurfacing issue rather than isolated damage.', severity: 'Critical', roadType: 'Highway', status: 'Reported', rejected: false, location: 'Hadapsar bypass', upvotes: 49, date: '2 days ago', photo: null, notes: '' },
+    { id: 'PIRM-111', title: 'Small pothole near residential gate', description: 'A shallow but widening pothole near house entrances, growing after recent rain.', severity: 'Low', roadType: 'Residential Street', status: 'Fixed', rejected: false, location: 'Kothrud Society Lane 3', upvotes: 11, date: '8 days ago', photo: null, notes: 'Patched by municipal crew.' },
+    { id: 'PIRM-112', title: 'Pothole causing traffic slowdown at peak hours', description: 'Vehicles are braking suddenly to avoid it, causing minor pile-ups during rush hour.', severity: 'High', roadType: 'Main Road', status: 'Acknowledged', rejected: false, location: 'FC Road, near college gate', upvotes: 38, date: '3 days ago', photo: null, notes: 'Marked for resurfacing next week.' },
+    { id: 'PIRM-113', title: 'Medium pothole, edge crumbling further', description: 'The pothole edges are crumbling further with each rainfall, expanding its diameter.', severity: 'Medium', roadType: 'Residential Street', status: 'Reported', rejected: false, location: 'Aundh Society Road', upvotes: 14, date: '4 days ago', photo: null, notes: '' },
+  ];
+
+  let filters = { status: 'All', severity: 'All', search: '' };
+  let votedIds = new Set();
+  let nextIdNum = 114;
+  let pendingPhoto = null;
+  let pendingCoords = null;
+  let activeModalId = null;
+  let charts = {};
+
+  const root = document.getElementById('pirm-admin-root');
+
+  function trackHTML(status) {
+    const idx = STATUSES.indexOf(status);
+    return `
+      <div class="pirm-track">
+        ${STATUSES.map((s, i) => `
+          ${i > 0 ? `<div class="pirm-track-seg ${i <= idx ? 'filled' : ''}"></div>` : ''}
+          <div class="pirm-track-dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>
+        `).join('')}
+      </div>
+      <div class="pirm-track-labels"><span>Reported</span><span>Ack'd</span><span>Fixed</span></div>
+    `;
+  }
+
+  function statCounts() {
+    const counts = { Reported: 0, Acknowledged: 0, Fixed: 0, Rejected: 0 };
+    reports.forEach(r => { if (r.rejected) counts.Rejected++; else counts[r.status]++; });
+    return counts;
+  }
+
+  function renderLogin() {
+    root.innerHTML = `
+      <div class="pirm-login-wrap">
+        <div class="pirm-login-badge">🕳️</div>
+        <h2 class="pirm-display">PIRM Admin</h2>
+        <p>Pothole review console — sign in to continue</p>
+        <input id="pirm-login-user" type="text" placeholder="Username" autocomplete="off">
+        <input id="pirm-login-pass" type="password" placeholder="Password">
+        <button id="pirm-login-submit" class="pirm-login-btn">Log In</button>
+        <div class="pirm-login-error">${loginError}</div>
+        <div class="pirm-login-hint">Demo credentials — Username: <b>admin</b> &nbsp;Password: <b>admin123</b></div>
+      </div>
+    `;
+    const tryLogin = () => {
+      const u = document.getElementById('pirm-login-user').value.trim();
+      const p = document.getElementById('pirm-login-pass').value;
+      if (u === ADMIN_USER && p === ADMIN_PASS) { isLoggedIn = true; loginError = ''; render(); }
+      else { loginError = 'Incorrect username or password. Try again.'; render(); }
+    };
+    document.getElementById('pirm-login-submit').addEventListener('click', tryLogin);
+    document.getElementById('pirm-login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+  }
+
+  function buildCharts() {
+    if (typeof Chart === 'undefined') return;
+    Object.values(charts).forEach(c => c && c.destroy());
+
+    const sevCounts = SEVERITIES.map(s => reports.filter(r => r.severity === s && !r.rejected).length);
+    charts.severity = new Chart(document.getElementById('pirm-chart-severity'), {
+      type: 'bar',
+      data: { labels: SEVERITIES, datasets: [{ data: sevCounts, backgroundColor: SEVERITIES.map(s => getComputedStyle(document.documentElement).getPropertyValue ? '' : ''), borderRadius: 4 }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, maintainAspectRatio: false }
+    });
+    charts.severity.data.datasets[0].backgroundColor = ['#868e96', '#f5b700', '#f08c00', '#e03131'];
+    charts.severity.update();
+
+    const counts = statCounts();
+    charts.status = new Chart(document.getElementById('pirm-chart-status'), {
+      type: 'doughnut',
+      data: { labels: ['Reported', 'Acknowledged', 'Fixed', 'Rejected'], datasets: [{ data: [counts.Reported, counts.Acknowledged, counts.Fixed, counts.Rejected], backgroundColor: ['#f5b700', '#1971c2', '#2f9e44', '#c92a2a'] }] },
+      options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }, maintainAspectRatio: false }
+    });
+
+    charts.trend = new Chart(document.getElementById('pirm-chart-trend'), {
+      type: 'line',
+      data: { labels: ['Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7'], datasets: [{ data: [2, 4, 1, 5, 3, 4, 6], borderColor: '#e8590c', backgroundColor: 'rgba(232,89,12,0.15)', fill: true, tension: 0.35, pointRadius: 3 }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 2 } } }, maintainAspectRatio: false }
+    });
+  }
+
+  function modalHTML() {
+    if (!activeModalId) return '<div class="pirm-modal-overlay" id="pirm-modal-overlay"></div>';
+    const r = reports.find(x => x.id === activeModalId);
+    if (!r) return '<div class="pirm-modal-overlay" id="pirm-modal-overlay"></div>';
+    return `
+      <div class="pirm-modal-overlay open" id="pirm-modal-overlay">
+        <div class="pirm-modal">
+          <button class="pirm-modal-close" id="pirm-modal-close">✕</button>
+          <div class="pirm-modal-photo" style="${r.photo ? `background-image:url('${r.photo}')` : `background:${SEVERITY_COLOR[r.severity]}`}">${r.photo ? '' : '🕳️'}</div>
+          ${r.rejected ? '<div class="pirm-rejected-banner">🚫 This report has been rejected</div>' : ''}
+          <h3>${r.title}</h3>
+          <p class="pirm-modal-desc">${r.description || 'No additional description provided.'}</p>
+          <div class="pirm-modal-meta-grid">
+            <div><b>Report ID</b>${r.id}</div>
+            <div><b>Severity</b>${r.severity}</div>
+            <div><b>Road Type</b>${r.roadType}</div>
+            <div><b>Upvotes</b>${r.upvotes}</div>
+            <div><b>Location</b>${r.location}</div>
+            <div><b>Reported</b>${r.date}</div>
+          </div>
+          ${!r.rejected ? `<label>Update Status</label><select id="pirm-modal-status">${STATUSES.map(s => `<option value="${s}" ${r.status===s?'selected':''}>${s}</option>`).join('')}</select>` : ''}
+          <label>Admin Notes</label>
+          <textarea id="pirm-modal-notes" placeholder="Add internal notes about this report...">${r.notes || ''}</textarea>
+          <div class="pirm-modal-actions">
+            <button class="pirm-modal-btn pirm-btn-save" id="pirm-modal-save">Save Changes</button>
+            ${r.rejected ? `<button class="pirm-modal-btn pirm-btn-unreject" id="pirm-modal-unreject">Un-reject</button>` : `<button class="pirm-modal-btn pirm-btn-reject" id="pirm-modal-reject">Reject Report</button>`}
+            <button class="pirm-modal-btn pirm-btn-delete" id="pirm-modal-delete">Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function render() {
+    if (!isLoggedIn) { renderLogin(); return; }
+
+    const counts = statCounts();
+    const totalUpvotes = reports.reduce((sum, r) => sum + r.upvotes, 0);
+    const activeCount = reports.filter(r => !r.rejected).length;
+
+    const filtered = reports.filter(r => {
+      if (filters.status !== 'All' && (r.rejected || r.status !== filters.status)) return false;
+      if (filters.severity !== 'All' && r.severity !== filters.severity) return false;
+      if (filters.search && !(r.title + r.location).toLowerCase().includes(filters.search.toLowerCase())) return false;
+      return true;
+    });
+
+    root.innerHTML = `
+      <div class="pirm-header">
+        <div class="pirm-header-left">
+          <div class="pirm-badge-icon">🕳️</div>
+          <div>
+            <p class="pirm-title pirm-display">PIRM Admin — Potholes</p>
+            <p class="pirm-subtitle">Pothole Reporting Map — municipal review panel</p>
+          </div>
+        </div>
+        <div class="pirm-header-right">
+          <div class="pirm-live-tag"><span class="pirm-live-dot"></span>${activeCount} active</div>
+          <button class="pirm-logout-btn" id="pirm-logout">Log Out</button>
+        </div>
+      </div>
+
+      <div class="pirm-form-section">
+        <p class="pirm-form-heading pirm-display">🕳️ Report a New Pothole</p>
+        <div class="pirm-form-grid">
+          <input id="pirm-new-title" type="text" placeholder="Brief title, e.g. Pothole near bus stop">
+          <select id="pirm-new-severity">${SEVERITIES.map(s => `<option>${s}</option>`).join('')}</select>
+          <select id="pirm-new-roadtype">${ROAD_TYPES.map(r => `<option>${r}</option>`).join('')}</select>
+        </div>
+        <div class="pirm-form-row2">
+          <div class="pirm-upload-box">
+            <input id="pirm-new-photo" type="file" accept="image/*" capture="environment">
+            <img id="pirm-preview-thumb" class="pirm-preview-thumb" alt="preview">
+          </div>
+          <div class="pirm-geo-box">
+            <button id="pirm-geo-btn" class="pirm-geo-btn" type="button">📍 Use My Location</button>
+            <span id="pirm-geo-status" class="pirm-geo-status">No location attached yet</span>
+          </div>
+        </div>
+        <button id="pirm-submit-btn" class="pirm-submit-btn">Submit Report</button>
+        <p class="pirm-form-note">Photo and location are optional in this demo, but recommended for real reports.</p>
+      </div>
+
+      <div class="pirm-stats">
+        <div class="pirm-stat" style="--stat-color: var(--caution-yellow)"><div class="pirm-stat-num">${counts.Reported}</div><div class="pirm-stat-label">Reported</div></div>
+        <div class="pirm-stat" style="--stat-color: var(--route-blue)"><div class="pirm-stat-num">${counts.Acknowledged}</div><div class="pirm-stat-label">Acknowledged</div></div>
+        <div class="pirm-stat" style="--stat-color: var(--fixed-green)"><div class="pirm-stat-num">${counts.Fixed}</div><div class="pirm-stat-label">Fixed</div></div>
+        <div class="pirm-stat" style="--stat-color: var(--rejected-red)"><div class="pirm-stat-num">${counts.Rejected}</div><div class="pirm-stat-label">Rejected</div></div>
+        <div class="pirm-stat" style="--stat-color: var(--safety-orange)"><div class="pirm-stat-num">${totalUpvotes}</div><div class="pirm-stat-label">Upvotes</div></div>
+        <div class="pirm-stat" style="--stat-color: #868e96"><div class="pirm-stat-num">${activeCount ? Math.round((counts.Fixed / activeCount) * 100) : 0}%</div><div class="pirm-stat-label">Resolved</div></div>
+      </div>
+
+      <div class="pirm-analytics">
+        <div class="pirm-chart-card"><div class="pirm-chart-title">By Severity</div><canvas id="pirm-chart-severity"></canvas></div>
+        <div class="pirm-chart-card"><div class="pirm-chart-title">By Status</div><canvas id="pirm-chart-status"></canvas></div>
+        <div class="pirm-chart-card"><div class="pirm-chart-title">Reports Trend (mock, 7d)</div><canvas id="pirm-chart-trend"></canvas></div>
+      </div>
+
+      <div class="pirm-controls">
+        <input id="pirm-search" type="text" placeholder="Search by title or location..." value="${filters.search}">
+        <select id="pirm-filter-status">
+          <option ${filters.status==='All'?'selected':''}>All</option>
+          ${STATUSES.map(s => `<option ${filters.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <select id="pirm-filter-severity">
+          <option ${filters.severity==='All'?'selected':''}>All</option>
+          ${SEVERITIES.map(s => `<option ${filters.severity===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <span class="pirm-result-count">${filtered.length} of ${reports.length} shown</span>
+      </div>
+
+      <div class="pirm-list">
+        ${filtered.length === 0 ? '<div class="pirm-empty">No reports match these filters.</div>' : filtered.map(r => `
+          <div class="pirm-card ${r.rejected ? 'pirm-rejected' : ''}" data-open-id="${r.id}">
+            <div class="pirm-photo" style="${r.photo ? `background-image:url('${r.photo}')` : `background:${SEVERITY_COLOR[r.severity]}`}">${r.photo ? '' : '🕳️'}</div>
+            <div class="pirm-card-main">
+              <div class="pirm-card-top">
+                <span class="pirm-card-title">${r.title}</span>
+                <span class="pirm-tag" style="background:${SEVERITY_COLOR[r.severity]}">${r.severity}</span>
+                <span class="pirm-tag" style="background:var(--asphalt-soft)">${r.roadType}</span>
+                ${r.rejected ? '<span class="pirm-tag" style="background:var(--rejected-red)">Rejected</span>' : ''}
+              </div>
+              <div class="pirm-meta"><span>📍 ${r.location}</span><span>🕐 ${r.date}</span><span>#${r.id}</span></div>
+              ${!r.rejected ? trackHTML(r.status) : ''}
+            </div>
+            <div class="pirm-card-actions">
+              <button class="pirm-upvote ${votedIds.has(r.id) ? 'voted' : ''}" data-vote-id="${r.id}">▲ ${r.upvotes}</button>
+              <button class="pirm-view-btn" data-open-id="${r.id}">View Details</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      ${modalHTML()}
+    `;
+
+    buildCharts();
+
+    document.getElementById('pirm-logout').addEventListener('click', () => { isLoggedIn = false; render(); });
+    document.getElementById('pirm-search').addEventListener('input', e => { filters.search = e.target.value; render(); });
+    document.getElementById('pirm-filter-status').addEventListener('change', e => { filters.status = e.target.value; render(); });
+    document.getElementById('pirm-filter-severity').addEventListener('change', e => { filters.severity = e.target.value; render(); });
+
+    root.querySelectorAll('.pirm-upvote').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = e.currentTarget.getAttribute('data-vote-id');
+        const report = reports.find(r => r.id === id);
+        if (votedIds.has(id)) { votedIds.delete(id); report.upvotes -= 1; }
+        else { votedIds.add(id); report.upvotes += 1; }
+        render();
+      });
+    });
+
+    root.querySelectorAll('[data-open-id]').forEach(el => {
+      el.addEventListener('click', e => {
+        if (e.target.closest('.pirm-upvote')) return;
+        activeModalId = e.currentTarget.getAttribute('data-open-id');
+        render();
+      });
+    });
+
+    document.getElementById('pirm-new-photo').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        pendingPhoto = ev.target.result;
+        const thumb = document.getElementById('pirm-preview-thumb');
+        thumb.src = pendingPhoto;
+        thumb.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('pirm-geo-btn').addEventListener('click', () => {
+      const statusEl = document.getElementById('pirm-geo-status');
+      if (!navigator.geolocation) { statusEl.textContent = 'Geolocation not supported'; return; }
+      statusEl.textContent = 'Detecting location...';
+      navigator.geolocation.getCurrentPosition(
+        pos => { pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; statusEl.textContent = `📍 ${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}`; },
+        () => { statusEl.textContent = 'Location access denied or unavailable'; },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    });
+
+    document.getElementById('pirm-submit-btn').addEventListener('click', () => {
+      const title = document.getElementById('pirm-new-title').value.trim();
+      const severity = document.getElementById('pirm-new-severity').value;
+      const roadType = document.getElementById('pirm-new-roadtype').value;
+      if (!title) { document.getElementById('pirm-new-title').focus(); return; }
+      const locationText = pendingCoords ? `${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}` : 'Location not attached';
+      reports.unshift({ id: `PIRM-${nextIdNum++}`, title, description: '', severity, roadType, status: 'Reported', rejected: false, location: locationText, upvotes: 0, date: 'Just now', photo: pendingPhoto, notes: '' });
+      pendingPhoto = null; pendingCoords = null;
+      render();
+    });
+
+    const overlay = document.getElementById('pirm-modal-overlay');
+    if (overlay) {
+      overlay.addEventListener('click', e => { if (e.target === overlay) { activeModalId = null; render(); } });
+      const closeBtn = document.getElementById('pirm-modal-close');
+      if (closeBtn) closeBtn.addEventListener('click', () => { activeModalId = null; render(); });
+
+      const saveBtn = document.getElementById('pirm-modal-save');
+      if (saveBtn) saveBtn.addEventListener('click', () => {
+        const r = reports.find(x => x.id === activeModalId);
+        const statusSel = document.getElementById('pirm-modal-status');
+        if (statusSel) r.status = statusSel.value;
+        r.notes = document.getElementById('pirm-modal-notes').value;
+        activeModalId = null;
+        render();
+      });
+
+      const rejectBtn = document.getElementById('pirm-modal-reject');
+      if (rejectBtn) rejectBtn.addEventListener('click', () => { reports.find(x => x.id === activeModalId).rejected = true; activeModalId = null; render(); });
+
+      const unrejectBtn = document.getElementById('pirm-modal-unreject');
+      if (unrejectBtn) unrejectBtn.addEventListener('click', () => { reports.find(x => x.id === activeModalId).rejected = false; activeModalId = null; render(); });
+
+      const deleteBtn = document.getElementById('pirm-modal-delete');
+      if (deleteBtn) deleteBtn.addEventListener('click', () => {
+        if (confirm('Delete this report permanently? This cannot be undone.')) {
+          reports = reports.filter(x => x.id !== activeModalId);
+          activeModalId = null;
+          render();
+        }
+      });
+    }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
