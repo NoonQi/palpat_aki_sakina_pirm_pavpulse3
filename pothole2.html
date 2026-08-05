@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Report Map — Potholes Only</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+
+<style>
+  :root {
+    --bg: #10151b; --panel: #171e26; --border: #263140;
+    --text: #e6edf3; --muted: #8b98a5;
+    --low: #4caf7d; --med: #e0a53e; --high: #e05a4c;
+    --accent: #4f8ff7;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+  #app { display: flex; flex-direction: column; height: 100%; }
+
+  header { padding: 14px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  header h1 { font-size: 15px; font-weight: 600; margin: 0; }
+  header p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+  main { flex: 1; display: flex; min-height: 0; }
+
+  #map { flex: 1; min-height: 400px; background: #0c1015; }
+
+  #sidebar {
+    width: 300px; border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; background: var(--panel);
+  }
+  #sidebar .sidebar-head {
+    padding: 12px 14px; border-bottom: 1px solid var(--border);
+    font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  #report-list { flex: 1; overflow-y: auto; }
+
+  .report-card {
+    padding: 12px 14px; border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 6px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .report-card:hover { background: rgba(255,255,255,0.03); }
+  .report-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .report-title { font-size: 13px; font-weight: 600; line-height: 1.3; }
+  .report-area { font-size: 11.5px; color: var(--muted); }
+
+  .priority-pill {
+    display: inline-block; padding: 1px 7px; border-radius: 999px;
+    font-size: 10.5px; font-weight: 600; color: #0c1015; white-space: nowrap;
+  }
+
+  .vote-row { display: flex; align-items: center; justify-content: space-between; }
+  .upvote-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(79,143,247,0.12); border: 1px solid rgba(79,143,247,0.4);
+    color: var(--accent); border-radius: 999px; padding: 4px 10px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .upvote-btn:hover { background: rgba(79,143,247,0.22); }
+  .upvote-btn:active { transform: scale(0.96); }
+  .upvote-btn.voted {
+    background: var(--accent); border-color: var(--accent); color: #0c1015; cursor: default;
+  }
+  .upvote-btn:disabled { opacity: 0.85; }
+  .upvote-count { font-variant-numeric: tabular-nums; }
+
+  .cluster-icon { display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 12px; color: #0c1015; border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.08); }
+  .cluster-low  { background: var(--low); }
+  .cluster-med  { background: var(--med); }
+  .cluster-high { background: var(--high); }
+  .report-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.7); }
+
+  .leaflet-popup-content-wrapper { background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+  .leaflet-popup-tip { background: var(--panel); }
+  .popup-title { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+  .popup-row { font-size: 12px; color: var(--muted); margin: 2px 0; }
+  .popup-vote-row { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div>
+      <h1>Pothole Reports — Map &amp; List</h1>
+      <p>Upvote a pothole report to signal it needs attention. One vote per report per session.</p>
+    </div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--high)"></i>High</span>
+      <span><i class="dot" style="background:var(--med)"></i>Medium</span>
+      <span><i class="dot" style="background:var(--low)"></i>Low</span>
+    </div>
+  </header>
+  <main>
+    <div id="map"></div>
+    <aside id="sidebar">
+      <div class="sidebar-head">Potholes, sorted by upvotes</div>
+      <div id="report-list"></div>
+    </aside>
+  </main>
+</div>
+
+<script>
+function generateMockReports() {
+  const centers = [
+    { lat: 18.5204, lng: 73.8567, name: "Shivajinagar" },
+    { lat: 18.5679, lng: 73.9143, name: "Kalyani Nagar" },
+    { lat: 18.4635, lng: 73.8676, name: "Katraj" },
+    { lat: 18.5912, lng: 73.7389, name: "Hinjewadi" }
+  ];
+  const weightByCenter = [[0.1,0.2,0.7],[0.3,0.4,0.3],[0.7,0.25,0.05],[0.4,0.4,0.2]];
+  const counts = [10, 8, 7, 5];
+  
+  // Restricted exclusively to "Pothole"
+  const categories = ["Pothole"];
+
+  let reports = [];
+  let id = 1;
+  centers.forEach((c, ci) => {
+    for (let i = 0; i < counts[ci]; i++) {
+      const r = Math.random();
+      const w = weightByCenter[ci];
+      const priority = r < w[0] ? "low" : r < w[0] + w[1] ? "medium" : "high";
+      reports.push({
+        id: id++,
+        title: categories[Math.floor(Math.random() * categories.length)],
+        area: c.name,
+        priority,
+        upvotes: Math.floor(Math.random() * 30),
+        lat: c.lat + (Math.random() - 0.5) * 0.03,
+        lng: c.lng + (Math.random() - 0.5) * 0.03
+      });
+    }
+  });
+  return reports;
+}
+
+const reports = generateMockReports();
+const votedIds = new Set(); 
+
+function upvoteReport(reportId) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const report = reports.find(r => r.id === reportId);
+      if (!report) return reject(new Error("Report not found"));
+      report.upvotes += 1;
+      resolve(report.upvotes);
+    }, 250);
+  });
+}
+
+const map = L.map("map", { zoomControl: true }).setView([18.52, 73.86], 12);
+
+const tileLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '&copy; OpenStreetMap contributors',
+  maxZoom: 19
+});
+tileLayer.addTo(map);
+
+let tileErrorShown = false;
+tileLayer.on("tileerror", () => {
+  if (tileErrorShown) return;
+  tileErrorShown = true;
+  const warning = document.createElement("div");
+  warning.style.cssText = "position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#e05a4c;color:#fff;padding:8px 14px;border-radius:6px;font-size:12px;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,0.3);";
+  warning.textContent = "Map tiles failed to load (network restriction in this preview).";
+  document.getElementById("map").appendChild(warning);
+});
+
+const priorityColor = { low: "#4caf7d", medium: "#e0a53e", high: "#e05a4c" };
+const priorityRank = { low: 0, medium: 1, high: 2 };
+
+function createClusterIcon(cluster) {
+  const markers = cluster.getAllChildMarkers();
+  let maxPriority = "low";
+  markers.forEach(m => {
+    if (priorityRank[m.options.priority] > priorityRank[maxPriority]) maxPriority = m.options.priority;
+  });
+  const count = cluster.getChildCount();
+  const size = Math.min(60, 32 + Math.sqrt(count) * 5);
+  const colorClass = maxPriority === "high" ? "cluster-high" : maxPriority === "medium" ? "cluster-med" : "cluster-low";
+  return L.divIcon({
+    html: `<div class="cluster-icon ${colorClass}" style="width:${size}px;height:${size}px;">${count}</div>`,
+    className: "", iconSize: L.point(size, size)
+  });
+}
+
+const clusterGroup = L.markerClusterGroup({
+  iconCreateFunction: createClusterIcon,
+  showCoverageOnHover: false,
+  maxClusterRadius: 70,
+  spiderfyOnMaxZoom: true,
+  disableClusteringAtZoom: 17
+});
+
+const markerById = {}; 
+
+reports.forEach(r => {
+  const marker = L.marker([r.lat, r.lng], {
+    priority: r.priority,
+    icon: L.divIcon({
+      html: `<div class="report-dot" style="background:${priorityColor[r.priority]}"></div>`,
+      className: "", iconSize: [16, 16]
+    })
+  });
+  marker.bindPopup(() => renderPopupHtml(r.id));
+  markerById[r.id] = marker;
+  clusterGroup.addLayer(marker);
+});
+
+map.addLayer(clusterGroup);
+
+function renderPopupHtml(reportId) {
+  const r = reports.find(x => x.id === reportId);
+  const voted = votedIds.has(reportId);
+  return `
+    <div class="popup-title">${r.title}</div>
+    <div class="popup-row">${r.area}</div>
+    <div class="popup-row">
+      Priority: <span class="priority-pill" style="background:${priorityColor[r.priority]}">${r.priority}</span>
+    </div>
+    <div class="popup-vote-row">
+      <button class="upvote-btn ${voted ? "voted" : ""}" data-report-id="${r.id}" data-source="popup" ${voted ? "disabled" : ""}>
+        ▲ <span class="upvote-count">${r.upvotes}</span>
+      </button>
+    </div>
+  `;
+}
+
+const listEl = document.getElementById("report-list");
+
+function renderList() {
+  const sorted = [...reports].sort((a, b) => b.upvotes - a.upvotes);
+  listEl.innerHTML = sorted.map(r => {
+    const voted = votedIds.has(r.id);
+    return `
+      <div class="report-card" data-goto-id="${r.id}">
+        <div class="report-card-top">
+          <div>
+            <div class="report-title">${r.title}</div>
+            <div class="report-area">${r.area}</div>
+          </div>
+          <span class="priority-pill" style="background:${priorityColor[r.priority]}">${r.priority}</span>
+        </div>
+        <div class="vote-row">
+          <button class="upvote-btn ${voted ? "voted" : ""}" data-report-id="${r.id}" data-source="list" ${voted ? "disabled" : ""}>
+            ▲ <span class="upvote-count">${r.upvotes}</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+renderList();
+
+async function handleUpvoteClick(btn) {
+  const reportId = Number(btn.dataset.reportId);
+  if (votedIds.has(reportId) || btn.disabled) return;
+
+  btn.disabled = true;
+  votedIds.add(reportId);
+  const report = reports.find(r => r.id === reportId);
+  const countEl = btn.querySelector(".upvote-count");
+  countEl.textContent = report.upvotes + 1;
+  btn.classList.add("voted");
+
+  try {
+    await upvoteReport(reportId);
+    renderList(); 
+    const marker = markerById[reportId];
+    if (marker.isPopupOpen()) marker.setPopupContent(renderPopupHtml(reportId));
+  } catch (err) {
+    votedIds.delete(reportId);
+    btn.disabled = false;
+    btn.classList.remove("voted");
+    countEl.textContent = report.upvotes;
+    console.error("Upvote failed:", err);
+  }
+}
+
+document.getElementById("sidebar").addEventListener("click", (e) => {
+  const btn = e.target.closest(".upvote-btn");
+  if (btn) { handleUpvoteClick(btn); return; }
+  const card = e.target.closest(".report-card");
+  if (card) {
+    const r = reports.find(x => x.id === Number(card.dataset.gotoId));
+    map.setView([r.lat, r.lng], 17, { animate: true });
+    setTimeout(() => markerById[r.id].openPopup(), 400);
+  }
+});
+
+document.getElementById("map").addEventListener("click", (e) => {
+  const btn = e.target.closest(".upvote-btn");
+  if (btn) handleUpvoteClick(btn);
+});
+</script>
+</body>
+</html>

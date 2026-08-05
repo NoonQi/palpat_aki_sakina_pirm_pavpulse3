@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root { --asphalt: #24262b; --safety-orange: #e8590c; --route-blue: #1971c2; --fixed-green: #2f9e44; }
+  :root { --asphalt: #24262b; --safety-orange: #e8590c; --route-blue: #1971c2; --fixed-green: #2f9e44; --caution-yellow: #f5b700; }
   body { font-family: 'Inter', sans-serif; background: #f2efe8; }
   .pirm-display { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; }
   .navbar-pirm { background: var(--asphalt); }
@@ -35,6 +36,24 @@
   <div class="container">
     <h1 class="pirm-display">Pothole &amp; Infrastructure Reporting Map</h1>
     <p>A crowdsourced platform for reporting road damage, tracking fixes, and visualizing hotspots across the city. Pick a module below.</p>
+    <p>Citizens report road damage with a photo and location. Reports get upvoted, reviewed, and tracked from the moment they're filed to the moment they're fixed.</p>
+
+    <div class="pirm-pipeline">
+      <div class="pirm-pipeline-step">
+        <div class="pirm-pipeline-dot" style="background: var(--caution-yellow); color: #24262b;"><i class="bi bi-flag-fill"></i></div>
+        <div class="pirm-pipeline-label"><b>Reported</b>Citizen files the issue</div>
+      </div>
+      <span class="pirm-pipeline-arrow">›</span>
+      <div class="pirm-pipeline-step">
+        <div class="pirm-pipeline-dot" style="background: var(--route-blue);"><i class="bi bi-eye-fill"></i></div>
+        <div class="pirm-pipeline-label"><b>Acknowledged</b>Admin reviews it</div>
+      </div>
+      <span class="pirm-pipeline-arrow">›</span>
+      <div class="pirm-pipeline-step">
+        <div class="pirm-pipeline-dot" style="background: var(--fixed-green);"><i class="bi bi-check-lg"></i></div>
+        <div class="pirm-pipeline-label"><b>Fixed</b>Issue resolved</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -77,5 +96,121 @@
   </div>
 </div>
 
+  </div>
+</div>
+
+<!-- Public browse section -->
+<div class="container mb-5">
+  <hr class="mb-5">
+  <p class="pirm-section-title"><i class="bi bi-list-ul me-2"></i>Browse Recent Reports</p>
+  <p class="pirm-section-sub">See what's already been reported near you. <a href="user-login.html">Sign in</a> to upvote or submit your own.</p>
+
+  <div class="pirm-filter-bar">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+          <input type="text" class="form-control" id="pirm-search" placeholder="Search by title or location...">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" id="pirm-filter-status">
+          <option value="All">All Statuses</option>
+          <option>Reported</option><option>Acknowledged</option><option>Fixed</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" id="pirm-filter-severity">
+          <option value="All">All Severities</option>
+          <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" id="pirm-sort">
+          <option value="newest">Sort: Newest</option>
+          <option value="upvotes">Sort: Most Upvoted</option>
+          <option value="severity">Sort: Severity (High→Low)</option>
+        </select>
+      </div>
+      <div class="col-md-2 text-md-end">
+        <span class="badge bg-secondary" id="pirm-result-count"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4" id="pirm-report-grid"></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function() {
+  const reports = PIRM_REPORTS;
+  let filters = { status: 'All', severity: 'All', search: '' };
+  let sortBy = 'newest';
+  reports.forEach((r, i) => { if (r.recency === undefined) r.recency = i; });
+
+  function progressPercent(status) { return { Reported: 15, Acknowledged: 55, Fixed: 100 }[status]; }
+  function progressBarClass(status) { return { Reported: 'bg-warning', Acknowledged: 'bg-primary', Fixed: 'bg-success' }[status]; }
+
+  function cardHTML(r) {
+    return `
+      <div class="col-md-6 col-lg-4">
+        <div class="card pirm-report-card h-100">
+          <div class="pirm-report-photo" style="${r.photo ? `background-image:url('${r.photo}')` : 'background:#495057'}">
+            ${r.photo ? '' : '<i class="bi bi-cone-striped"></i>'}
+          </div>
+          <div class="card-body">
+            <div class="d-flex flex-wrap gap-1 mb-2">
+              <span class="badge pirm-severity-${r.severity}">${r.severity}</span>
+              <span class="badge pirm-status-${r.status}">${r.status}</span>
+              <span class="badge bg-light text-dark border">${r.roadType}</span>
+            </div>
+            <h6 class="fw-bold mb-1">${r.title}</h6>
+            <p class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>${r.location} &nbsp;·&nbsp; <i class="bi bi-clock me-1"></i>${r.date}</p>
+            <div class="pirm-progress-wrap mb-3">
+              <div class="progress"><div class="progress-bar ${progressBarClass(r.status)}" style="width:${progressPercent(r.status)}%"></div></div>
+              <div class="pirm-progress-labels"><span>Reported</span><span>Ack'd</span><span>Fixed</span></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="user-login.html" class="btn btn-outline-secondary btn-sm pirm-upvote-hint">
+                <i class="bi bi-hand-thumbs-up-fill me-1"></i>${r.upvotes}
+              </a>
+              <small class="text-muted">#${r.id}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function render() {
+    let filtered = reports.filter(r => {
+      if (filters.status !== 'All' && r.status !== filters.status) return false;
+      if (filters.severity !== 'All' && r.severity !== filters.severity) return false;
+      if (filters.search && !(r.title + r.location).toLowerCase().includes(filters.search.toLowerCase())) return false;
+      return true;
+    });
+
+    const sevRank = { Critical: 4, High: 3, Medium: 2, Low: 1 };
+    if (sortBy === 'newest') filtered.sort((a, b) => b.recency - a.recency);
+    else if (sortBy === 'upvotes') filtered.sort((a, b) => b.upvotes - a.upvotes);
+    else if (sortBy === 'severity') filtered.sort((a, b) => sevRank[b.severity] - sevRank[a.severity]);
+
+    document.getElementById('pirm-result-count').textContent = `${filtered.length}/${reports.length}`;
+
+    const grid = document.getElementById('pirm-report-grid');
+    grid.innerHTML = filtered.length === 0
+      ? `<div class="col-12 pirm-empty-state"><i class="bi bi-inboxes fs-1 d-block mb-2"></i>No reports match your filters.</div>`
+      : filtered.map(cardHTML).join('');
+  }
+
+  document.getElementById('pirm-search').addEventListener('input', e => { filters.search = e.target.value; render(); });
+  document.getElementById('pirm-filter-status').addEventListener('change', e => { filters.status = e.target.value; render(); });
+  document.getElementById('pirm-filter-severity').addEventListener('change', e => { filters.severity = e.target.value; render(); });
+  document.getElementById('pirm-sort').addEventListener('change', e => { sortBy = e.target.value; render(); });
+
+  render();
+})();
+</script>
 </body>
 </html>
