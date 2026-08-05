@@ -10,7 +10,7 @@ This repo currently contains a fully working **frontend prototype** with mock da
 
 Once deployed via GitHub Pages, the site is available at:
 ```
-https://<your-github-username>.github.io/<repo-name>/
+https://pallu04patil-blip.github.io/palpat_aki_sakina_pirm_pavpulse3/
 ```
 `index.html` loads automatically at that root URL.
 
