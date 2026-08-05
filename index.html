@@ -8,6 +8,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  :root { --asphalt: #24262b; --safety-orange: #e8590c; --route-blue: #1971c2; --fixed-green: #2f9e44; }
   :root { --asphalt: #24262b; --safety-orange: #e8590c; --route-blue: #1971c2; --fixed-green: #2f9e44; --caution-yellow: #f5b700; }
   body { font-family: 'Inter', sans-serif; background: #f2efe8; }
   .pirm-display { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; }
@@ -16,45 +17,16 @@
   .navbar-pirm .navbar-brand i { color: var(--safety-orange); }
   .pirm-hero { background: var(--asphalt); color: #fff; padding: 50px 0 60px; }
   .pirm-hero p { color: #c9cbd1; max-width: 560px; }
-
-  .pirm-pipeline { display: flex; align-items: center; gap: 0; margin: 30px 0 10px; flex-wrap: wrap; }
-  .pirm-pipeline-step { display: flex; align-items: center; gap: 10px; }
-  .pirm-pipeline-dot { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; flex-shrink: 0; }
-  .pirm-pipeline-label { font-size: 12.5px; }
-  .pirm-pipeline-label b { display: block; font-size: 13.5px; }
-  .pirm-pipeline-arrow { color: #565962; font-size: 18px; margin: 0 18px; }
-
-  .pirm-module-card { border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(36,38,43,0.1); height: 100%; }
+  .pirm-module-card { border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(36,38,43,0.1); height: 100%; transition: transform .15s ease; text-decoration: none; color: inherit; display: block; }
+  .pirm-module-card:hover { transform: translateY(-4px); color: inherit; }
   .pirm-module-icon { width: 52px; height: 52px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; margin-bottom: 14px; }
   .pirm-module-card .card-body { padding: 26px; }
-  .pirm-module-owner { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #868e96; margin-top: 12px; }
-  .pirm-map-card { text-decoration: none; color: inherit; transition: transform .15s ease; }
-  .pirm-map-card:hover { transform: translateY(-4px); color: inherit; }
-
-  .pirm-section-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-  .pirm-section-sub { font-size: 13px; color: #868e96; margin-bottom: 20px; }
-
-  .pirm-filter-bar { background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(36,38,43,0.06); padding: 14px 16px; margin-bottom: 24px; }
-
-  .pirm-severity-Low { background: #868e96; }
-  .pirm-severity-Medium { background: var(--caution-yellow); color: #24262b !important; }
-  .pirm-severity-High { background: #f08c00; }
-  .pirm-severity-Critical { background: #e03131; }
-  .pirm-status-Reported { background: var(--caution-yellow); color: #24262b !important; }
-  .pirm-status-Acknowledged { background: var(--route-blue); }
-  .pirm-status-Fixed { background: var(--fixed-green); }
-
-  .pirm-report-card { border: none; border-radius: 10px; box-shadow: 0 4px 14px rgba(36,38,43,0.08); overflow: hidden; }
-  .pirm-report-photo { height: 120px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 34px; color: #fff; }
-  .pirm-progress-wrap .progress { height: 6px; border-radius: 4px; }
-  .pirm-progress-labels { display: flex; justify-content: space-between; font-size: 9.5px; text-transform: uppercase; color: #868e96; margin-top: 3px; }
-  .pirm-upvote-hint { border-radius: 20px; font-weight: 700; }
-  .pirm-empty-state { text-align: center; padding: 40px 20px; color: #868e96; }
+  .pirm-module-owner { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: #868e96; margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<nav class="navbar navbar-pirm navbar-dark py-3">
+<nav class="navbar navbar-pirm navbar-dark py-3 mb-0">
   <div class="container">
     <span class="navbar-brand mb-0 h1"><i class="bi bi-cone-striped me-2"></i>PIRM</span>
   </div>
@@ -63,6 +35,7 @@
 <div class="pirm-hero">
   <div class="container">
     <h1 class="pirm-display">Pothole &amp; Infrastructure Reporting Map</h1>
+    <p>A crowdsourced platform for reporting road damage, tracking fixes, and visualizing hotspots across the city. Pick a module below.</p>
     <p>Citizens report road damage with a photo and location. Reports get upvoted, reviewed, and tracked from the moment they're filed to the moment they're fixed.</p>
 
     <div class="pirm-pipeline">
@@ -87,40 +60,30 @@
 <div class="container my-5">
   <div class="row g-4">
 
-    <!-- Citizen entry point -->
     <div class="col-md-4">
-      <div class="card pirm-module-card h-100">
-        <div class="card-body d-flex flex-column">
+      <a href="userdashboard.html" class="pirm-module-card card">
+        <div class="card-body">
           <div class="pirm-module-icon" style="background: var(--fixed-green);"><i class="bi bi-camera-fill"></i></div>
           <h5 class="fw-bold">Citizen Portal</h5>
-          <p class="small text-muted">Report new potholes with photo + geotag, browse existing reports, and upvote the ones that matter most to you.</p>
-          <div class="mt-auto d-flex gap-2">
-            <a href="userlogin.html" class="btn btn-sm btn-outline-dark flex-fill">Sign In</a>
-            <a href="userregister.html" class="btn btn-sm btn-success flex-fill">Register</a>
-          </div>
+          <p class="small text-muted mb-0">Report new potholes with photo + geotag, browse existing reports, and upvote the ones that matter most to you.</p>
           <div class="pirm-module-owner">SCRUM-32 &middot; User Dashboard</div>
         </div>
-      </div>
+      </a>
     </div>
 
-    <!-- Admin entry point -->
     <div class="col-md-4">
-      <div class="card pirm-module-card h-100">
-        <div class="card-body d-flex flex-column">
+      <a href="admindashboard.html" class="pirm-module-card card">
+        <div class="card-body">
           <div class="pirm-module-icon" style="background: var(--safety-orange);"><i class="bi bi-clipboard-data-fill"></i></div>
           <h5 class="fw-bold">Admin Console</h5>
-          <p class="small text-muted">Review incoming reports, update status, add internal notes, and track resolution analytics.</p>
-          <div class="mt-auto">
-            <a href="admindashboard.html" class="btn btn-sm btn-outline-dark w-100">Admin Login</a>
-          </div>
+          <p class="small text-muted mb-0">Review incoming reports, update status, add internal notes, and track resolution analytics.</p>
           <div class="pirm-module-owner">SCRUM-27 &middot; Admin Dashboard</div>
         </div>
-      </div>
+      </a>
     </div>
 
-    <!-- Map module -->
     <div class="col-md-4">
-      <a href="pothole2.html" class="pirm-map-card card pirm-module-card h-100">
+      <a href="pothole2.html" class="pirm-module-card card">
         <div class="card-body">
           <div class="pirm-module-icon" style="background: var(--route-blue);"><i class="bi bi-geo-alt-fill"></i></div>
           <h5 class="fw-bold">Hotspot Map</h5>
@@ -129,6 +92,9 @@
         </div>
       </a>
     </div>
+
+  </div>
+</div>
 
   </div>
 </div>
