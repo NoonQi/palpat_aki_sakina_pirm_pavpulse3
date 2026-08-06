@@ -32,19 +32,131 @@
   .legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
   .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+/* ---------- Layout ---------- */
 
-  main { flex: 1; display: flex; min-height: 0; }
+main{
+    flex:1;
+    display:flex;
+    min-height:0;
+}
 
-  #map { flex: 1; min-height: 400px; background: #0c1015; }
+#map{
+    flex:1;
+    min-height:500px;
+    background:#0c1015;
+}
 
-  #sidebar {
-    width: 300px; border-left: 1px solid var(--border);
-    display: flex; flex-direction: column; background: var(--panel);
-  }
-  #sidebar .sidebar-head {
-    padding: 12px 14px; border-bottom: 1px solid var(--border);
-    font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;
-  }
+#sidebar{
+    width:320px;
+    min-width:280px;
+    max-width:350px;
+    border-left:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    background:var(--panel);
+}
+
+/* ---------- Tablets ---------- */
+
+@media (max-width:900px){
+
+    main{
+        flex-direction:column;
+    }
+
+    #map{
+        width:100%;
+        height:55vh;
+        min-height:350px;
+    }
+
+    #sidebar{
+        width:100%;
+        max-width:none;
+        min-width:100%;
+        height:45vh;
+        border-left:none;
+        border-top:1px solid var(--border);
+    }
+
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width:600px){
+
+    header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+        padding:12px;
+    }
+
+    .legend{
+        flex-wrap:wrap;
+        gap:10px;
+    }
+
+    header h1{
+        font-size:18px;
+    }
+
+    #map{
+        height:45vh;
+        min-height:280px;
+    }
+
+    #sidebar{
+        height:55vh;
+    }
+
+    .report-card{
+        padding:10px;
+    }
+
+    .report-title{
+        font-size:14px;
+    }
+
+    .upvote-btn{
+        width:100%;
+        justify-content:center;
+    }
+
+    .vote-row{
+        flex-direction:column;
+        gap:8px;
+        align-items:stretch;
+    }
+
+}
+
+/* ---------- Small Phones ---------- */
+
+@media (max-width:400px){
+
+    header{
+        padding:10px;
+    }
+
+    header h1{
+        font-size:16px;
+    }
+
+    .legend{
+        font-size:11px;
+    }
+
+    .priority-pill{
+        font-size:9px;
+    }
+
+    .upvote-btn{
+        font-size:11px;
+        padding:6px;
+    }
+
+}
   #report-list { flex: 1; overflow-y: auto; }
 
   .report-card {
