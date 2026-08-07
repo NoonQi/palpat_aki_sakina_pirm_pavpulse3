@@ -27,7 +27,7 @@
   .pirm-login-wrap input { width: 100%; font-family: inherit; font-size: 13px; padding: 10px 12px; margin-bottom: 10px; border: none; border-radius: 6px; background: #fff; color: var(--asphalt); }
   .pirm-login-btn { width: 100%; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--safety-orange); color: #fff; border: none; padding: 11px; border-radius: 6px; cursor: pointer; margin-top: 4px; }
   .pirm-login-error { color: #ff8787; font-size: 12px; margin-top: 10px; min-height: 14px; }
-  .pirm-login-hint { font-size: 11px; color: #7c7f87; margin-top: 16px; border-top: 1px solid #3a3d44; padding-top: 14px; }
+ /* .pirm-login-hint { font-size: 11px; color: #7c7f87; margin-top: 16px; border-top: 1px solid #3a3d44; padding-top: 14px; }*/
 
   .pirm-header { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 4px solid var(--asphalt); padding-bottom: 14px; margin-bottom: 22px; flex-wrap: wrap; gap: 10px; }
   .pirm-header-left { display: flex; align-items: center; gap: 12px; }
@@ -40,29 +40,15 @@
   @keyframes pirm-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
   .pirm-logout-btn { font-family: inherit; font-size: 11.5px; font-weight: 700; background: none; border: 2px solid var(--asphalt); color: var(--asphalt); padding: 5px 12px; border-radius: 20px; cursor: pointer; }
 
-  .pirm-form-section { background: var(--asphalt); color: var(--paper); border-radius: 8px; padding: 18px 18px 20px; margin-bottom: 26px; }
-  .pirm-form-heading { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
-  .pirm-form-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-  .pirm-form-grid input[type="text"], .pirm-form-grid select { width: 100%; font-family: inherit; font-size: 13px; padding: 9px 11px; border: none; border-radius: 6px; background: #fff; color: var(--asphalt); }
-  .pirm-form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-  .pirm-upload-box, .pirm-geo-box { border: 2px dashed #565962; border-radius: 6px; padding: 10px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.04); }
-  .pirm-upload-box input[type="file"] { font-size: 11px; color: var(--paper); flex: 1; }
-  .pirm-preview-thumb { width: 40px; height: 40px; border-radius: 5px; object-fit: cover; flex-shrink: 0; display: none; }
-  .pirm-geo-btn { font-family: inherit; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; background: var(--safety-orange); color: #fff; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-  .pirm-geo-status { font-size: 11.5px; color: #c9cbd1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pirm-submit-btn { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--fixed-green); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
-  .pirm-form-note { font-size: 11px; color: #9a9ca3; margin-top: 8px; }
-
   .pirm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-bottom: 22px; }
   .pirm-stat { background: var(--asphalt); color: var(--paper); border-radius: 8px; padding: 14px 16px; position: relative; overflow: hidden; }
   .pirm-stat::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--stat-color, var(--safety-orange)); }
   .pirm-stat-num { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 600; line-height: 1; }
   .pirm-stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #b8bac0; margin-top: 4px; }
-
-  .pirm-analytics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
+/*.pirm-analytics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
   .pirm-chart-card { background: #fff; border: 2px solid var(--asphalt); border-radius: 8px; padding: 14px; }
   .pirm-chart-title { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--asphalt-soft); margin-bottom: 8px; }
-  .pirm-chart-card canvas { max-height: 160px; }
+  .pirm-chart-card canvas { max-height: 160px; }*/
 
   .pirm-controls { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
   .pirm-controls input, .pirm-controls select { font-family: inherit; font-size: 13px; padding: 8px 12px; border: 2px solid var(--asphalt); border-radius: 6px; background: #fff; color: var(--asphalt); }
@@ -121,7 +107,7 @@
 
   @media (max-width: 700px) { .pirm-analytics { grid-template-columns: 1fr; } }
   @media (max-width: 560px) {
-    .pirm-form-grid, .pirm-form-row2, .pirm-modal-meta-grid { grid-template-columns: 1fr; }
+    .pirm-modal-meta-grid { grid-template-columns: 1fr; }
     .pirm-card { grid-template-columns: 60px 1fr; }
     .pirm-card::before { left: 76px; }
     .pirm-photo { width: 60px; height: 54px; font-size: 18px; }
@@ -137,9 +123,8 @@
   const STATUSES = ['Reported', 'Acknowledged', 'Fixed'];
   const SEVERITIES = ['Low', 'Medium', 'High', 'Critical'];
   const SEVERITY_COLOR = { Low: 'var(--sev-low)', Medium: 'var(--sev-medium)', High: 'var(--sev-high)', Critical: 'var(--sev-critical)' };
-  const ROAD_TYPES = ['Highway', 'Main Road', 'Residential Street', 'Service Lane'];
-  const ADMIN_USER = 'admin';
-  const ADMIN_PASS = 'admin123';
+  const ADMIN_USER = 'admin@pirm.com';
+  const ADMIN_PASS = 'admin@PIRM';
 
   let isLoggedIn = false;
   let loginError = '';
@@ -155,9 +140,6 @@
 
   let filters = { status: 'All', severity: 'All', search: '' };
   let votedIds = new Set();
-  let nextIdNum = 114;
-  let pendingPhoto = null;
-  let pendingCoords = null;
   let activeModalId = null;
   let charts = {};
 
@@ -192,7 +174,6 @@
         <input id="pirm-login-pass" type="password" placeholder="Password">
         <button id="pirm-login-submit" class="pirm-login-btn">Log In</button>
         <div class="pirm-login-error">${loginError}</div>
-        <div class="pirm-login-hint">Demo credentials — Username: <b>admin</b> &nbsp;Password: <b>admin123</b></div>
       </div>
     `;
     const tryLogin = () => {
@@ -212,11 +193,9 @@
     const sevCounts = SEVERITIES.map(s => reports.filter(r => r.severity === s && !r.rejected).length);
     charts.severity = new Chart(document.getElementById('pirm-chart-severity'), {
       type: 'bar',
-      data: { labels: SEVERITIES, datasets: [{ data: sevCounts, backgroundColor: SEVERITIES.map(s => getComputedStyle(document.documentElement).getPropertyValue ? '' : ''), borderRadius: 4 }] },
+      data: { labels: SEVERITIES, datasets: [{ data: sevCounts, backgroundColor: ['#868e96', '#f5b700', '#f08c00', '#e03131'], borderRadius: 4 }] },
       options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, maintainAspectRatio: false }
     });
-    charts.severity.data.datasets[0].backgroundColor = ['#868e96', '#f5b700', '#f08c00', '#e03131'];
-    charts.severity.update();
 
     const counts = statCounts();
     charts.status = new Chart(document.getElementById('pirm-chart-status'), {
@@ -294,27 +273,6 @@
         </div>
       </div>
 
-      <div class="pirm-form-section">
-        <p class="pirm-form-heading pirm-display">🕳️ Report a New Pothole</p>
-        <div class="pirm-form-grid">
-          <input id="pirm-new-title" type="text" placeholder="Brief title, e.g. Pothole near bus stop">
-          <select id="pirm-new-severity">${SEVERITIES.map(s => `<option>${s}</option>`).join('')}</select>
-          <select id="pirm-new-roadtype">${ROAD_TYPES.map(r => `<option>${r}</option>`).join('')}</select>
-        </div>
-        <div class="pirm-form-row2">
-          <div class="pirm-upload-box">
-            <input id="pirm-new-photo" type="file" accept="image/*" capture="environment">
-            <img id="pirm-preview-thumb" class="pirm-preview-thumb" alt="preview">
-          </div>
-          <div class="pirm-geo-box">
-            <button id="pirm-geo-btn" class="pirm-geo-btn" type="button">📍 Use My Location</button>
-            <span id="pirm-geo-status" class="pirm-geo-status">No location attached yet</span>
-          </div>
-        </div>
-        <button id="pirm-submit-btn" class="pirm-submit-btn">Submit Report</button>
-        <p class="pirm-form-note">Photo and location are optional in this demo, but recommended for real reports.</p>
-      </div>
-
       <div class="pirm-stats">
         <div class="pirm-stat" style="--stat-color: var(--caution-yellow)"><div class="pirm-stat-num">${counts.Reported}</div><div class="pirm-stat-label">Reported</div></div>
         <div class="pirm-stat" style="--stat-color: var(--route-blue)"><div class="pirm-stat-num">${counts.Acknowledged}</div><div class="pirm-stat-label">Acknowledged</div></div>
@@ -322,12 +280,6 @@
         <div class="pirm-stat" style="--stat-color: var(--rejected-red)"><div class="pirm-stat-num">${counts.Rejected}</div><div class="pirm-stat-label">Rejected</div></div>
         <div class="pirm-stat" style="--stat-color: var(--safety-orange)"><div class="pirm-stat-num">${totalUpvotes}</div><div class="pirm-stat-label">Upvotes</div></div>
         <div class="pirm-stat" style="--stat-color: #868e96"><div class="pirm-stat-num">${activeCount ? Math.round((counts.Fixed / activeCount) * 100) : 0}%</div><div class="pirm-stat-label">Resolved</div></div>
-      </div>
-
-      <div class="pirm-analytics">
-        <div class="pirm-chart-card"><div class="pirm-chart-title">By Severity</div><canvas id="pirm-chart-severity"></canvas></div>
-        <div class="pirm-chart-card"><div class="pirm-chart-title">By Status</div><canvas id="pirm-chart-status"></canvas></div>
-        <div class="pirm-chart-card"><div class="pirm-chart-title">Reports Trend (mock, 7d)</div><canvas id="pirm-chart-trend"></canvas></div>
       </div>
 
       <div class="pirm-controls">
@@ -394,41 +346,6 @@
       });
     });
 
-    document.getElementById('pirm-new-photo').addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        pendingPhoto = ev.target.result;
-        const thumb = document.getElementById('pirm-preview-thumb');
-        thumb.src = pendingPhoto;
-        thumb.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    });
-
-    document.getElementById('pirm-geo-btn').addEventListener('click', () => {
-      const statusEl = document.getElementById('pirm-geo-status');
-      if (!navigator.geolocation) { statusEl.textContent = 'Geolocation not supported'; return; }
-      statusEl.textContent = 'Detecting location...';
-      navigator.geolocation.getCurrentPosition(
-        pos => { pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; statusEl.textContent = `📍 ${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}`; },
-        () => { statusEl.textContent = 'Location access denied or unavailable'; },
-        { enableHighAccuracy: true, timeout: 8000 }
-      );
-    });
-
-    document.getElementById('pirm-submit-btn').addEventListener('click', () => {
-      const title = document.getElementById('pirm-new-title').value.trim();
-      const severity = document.getElementById('pirm-new-severity').value;
-      const roadType = document.getElementById('pirm-new-roadtype').value;
-      if (!title) { document.getElementById('pirm-new-title').focus(); return; }
-      const locationText = pendingCoords ? `${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}` : 'Location not attached';
-      reports.unshift({ id: `PIRM-${nextIdNum++}`, title, description: '', severity, roadType, status: 'Reported', rejected: false, location: locationText, upvotes: 0, date: 'Just now', photo: pendingPhoto, notes: '' });
-      pendingPhoto = null; pendingCoords = null;
-      render();
-    });
-
     const overlay = document.getElementById('pirm-modal-overlay');
     if (overlay) {
       overlay.addEventListener('click', e => { if (e.target === overlay) { activeModalId = null; render(); } });
@@ -438,26 +355,36 @@
       const saveBtn = document.getElementById('pirm-modal-save');
       if (saveBtn) saveBtn.addEventListener('click', () => {
         const r = reports.find(x => x.id === activeModalId);
-        const statusSel = document.getElementById('pirm-modal-status');
-        if (statusSel) r.status = statusSel.value;
-        r.notes = document.getElementById('pirm-modal-notes').value;
+        if (r) {
+          const statusSelect = document.getElementById('pirm-modal-status');
+          if (statusSelect) r.status = statusSelect.value;
+          r.notes = document.getElementById('pirm-modal-notes').value;
+        }
         activeModalId = null;
         render();
       });
 
       const rejectBtn = document.getElementById('pirm-modal-reject');
-      if (rejectBtn) rejectBtn.addEventListener('click', () => { reports.find(x => x.id === activeModalId).rejected = true; activeModalId = null; render(); });
+      if (rejectBtn) rejectBtn.addEventListener('click', () => {
+        const r = reports.find(x => x.id === activeModalId);
+        if (r) r.rejected = true;
+        activeModalId = null;
+        render();
+      });
 
       const unrejectBtn = document.getElementById('pirm-modal-unreject');
-      if (unrejectBtn) unrejectBtn.addEventListener('click', () => { reports.find(x => x.id === activeModalId).rejected = false; activeModalId = null; render(); });
+      if (unrejectBtn) unrejectBtn.addEventListener('click', () => {
+        const r = reports.find(x => x.id === activeModalId);
+        if (r) r.rejected = false;
+        activeModalId = null;
+        render();
+      });
 
       const deleteBtn = document.getElementById('pirm-modal-delete');
       if (deleteBtn) deleteBtn.addEventListener('click', () => {
-        if (confirm('Delete this report permanently? This cannot be undone.')) {
-          reports = reports.filter(x => x.id !== activeModalId);
-          activeModalId = null;
-          render();
-        }
+        reports = reports.filter(x => x.id !== activeModalId);
+        activeModalId = null;
+        render();
       });
     }
   }
