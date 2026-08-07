@@ -3,239 +3,234 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIRM — Pothole & Infrastructure Reporting Map</title>
+<title>PIRM — Citizen Portal</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { 
-    --asphalt: #24262b; 
-    --safety-orange: #e8590c; 
-    --route-blue: #1971c2; 
-    --fixed-green: #2f9e44; 
+  :root {
+    --asphalt: #24262b;
+    --safety-orange: #e8590c;
+    --route-blue: #1971c2;
+    --fixed-green: #2f9e44;
     --caution-yellow: #f5b700;
   }
-  body { font-family: 'Inter', sans-serif; background: #f2efe8; }
+  body { font-family: 'Inter', sans-serif; background: #f2efe8; padding-bottom: 60px; }
   .pirm-display { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; }
-  
-  /* Navbar Styling */
   .navbar-pirm { background: var(--asphalt); }
-  .navbar-pirm .navbar-brand { color: #fff; font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 1.35rem; }
+  .navbar-pirm .navbar-brand { color: #fff; font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: 0.02em; }
   .navbar-pirm .navbar-brand i { color: var(--safety-orange); }
-  
-  .btn-pirm-nav {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 7px 16px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-  }
-  .btn-pirm-login {
-    color: #fff;
-    border: 1.5px solid rgba(255,255,255,0.3);
-    background: transparent;
-  }
-  .btn-pirm-login:hover {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    border-color: #fff;
-  }
-  .btn-pirm-register {
-    background: var(--safety-orange);
-    color: #fff;
-    border: none;
-  }
-  .btn-pirm-register:hover {
-    background: #d04d08;
-    color: #fff;
-  }
 
-  /* Hero & Pipeline */
-  .pirm-hero { background: var(--asphalt); color: #fff; padding: 50px 0 60px; }
-  .pirm-hero p { color: #c9cbd1; max-width: 580px; }
-  .pirm-pipeline { display: flex; align-items: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
-  .pirm-pipeline-step { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.06); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-  .pirm-pipeline-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; flex-shrink: 0; }
-  .pirm-pipeline-label { font-size: 12px; line-height: 1.2; }
-  .pirm-pipeline-label b { display: block; font-size: 13px; }
-  .pirm-pipeline-arrow { color: #6c757d; font-size: 18px; }
+  .pirm-hero { background: var(--asphalt); color: #fff; padding: 34px 0 42px; margin-bottom: -26px; }
+  .pirm-hero h1 { font-size: 26px; }
+  .pirm-hero p { color: #c9cbd1; font-size: 14px; max-width: 560px; }
 
-  /* Cards */
-  .pirm-module-card { border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(36,38,43,0.08); height: 100%; transition: transform .15s ease, box-shadow .15s ease; text-decoration: none; color: inherit; display: block; background: #fff; }
-  .pirm-module-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(36,38,43,0.12); color: inherit; }
-  .pirm-module-icon { width: 52px; height: 52px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; margin-bottom: 14px; }
-  .pirm-module-card .card-body { padding: 26px; }
-  .pirm-module-owner { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: #868e96; margin-top: 14px; }
+  .pirm-form-card { border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(36,38,43,0.12); }
+  .pirm-form-card .card-header { background: var(--safety-orange); color: #fff; font-weight: 600; border-radius: 12px 12px 0 0 !important; padding: 14px 20px; }
+  .pirm-upload-preview { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; display: none; }
+  .btn-pirm-primary { background: var(--fixed-green); border-color: var(--fixed-green); font-weight: 600; }
+  .btn-pirm-primary:hover { background: #268a3d; border-color: #268a3d; }
+  .btn-pirm-geo { background: var(--safety-orange); border-color: var(--safety-orange); color: #fff; font-weight: 600; font-size: 13px; }
+  .btn-pirm-geo:hover { background: #d14e0a; color: #fff; }
 
-  /* Browse & Filter Section */
-  .pirm-section-title { font-family: 'Oswald', sans-serif; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 2px; }
-  .pirm-section-sub { font-size: 13.5px; color: #6c757d; margin-bottom: 20px; }
-  .pirm-filter-bar { background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 24px; }
-  
-  /* Report Card */
-  .pirm-report-card { border: none; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); overflow: hidden; }
-  .pirm-report-photo { height: 160px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 32px; }
-  .pirm-progress-wrap .progress { height: 6px; border-radius: 10px; background-color: #e9ecef; }
-  .pirm-progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: #868e96; margin-top: 4px; text-transform: uppercase; }
-  
-  /* Status Badges */
-  .pirm-severity-Critical { background-color: #e03131; color: #fff; }
-  .pirm-severity-High { background-color: #f08c00; color: #fff; }
-  .pirm-severity-Medium { background-color: #f5b700; color: #24262b; }
-  .pirm-severity-Low { background-color: #868e96; color: #fff; }
-  
-  .pirm-status-Reported { background-color: #f5b700; color: #24262b; }
-  .pirm-status-Acknowledged { background-color: #1971c2; color: #fff; }
-  .pirm-status-Fixed { background-color: #2f9e44; color: #fff; }
+  .pirm-severity-Low { background: #868e96; }
+  .pirm-severity-Medium { background: var(--caution-yellow); color: #24262b !important; }
+  .pirm-severity-High { background: #f08c00; }
+  .pirm-severity-Critical { background: #e03131; }
+  .pirm-status-Reported { background: var(--caution-yellow); color: #24262b !important; }
+  .pirm-status-Acknowledged { background: var(--route-blue); }
+  .pirm-status-Fixed { background: var(--fixed-green); }
 
-  .pirm-empty-state { text-align: center; padding: 60px 20px; color: #868e96; }
+  .pirm-report-card { border: none; border-radius: 10px; box-shadow: 0 4px 14px rgba(36,38,43,0.08); overflow: hidden; transition: transform .12s ease; cursor: pointer; }
+  .pirm-report-card:hover { transform: translateY(-2px); }
+  .pirm-report-photo { height: 140px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; }
+  .pirm-upvote-btn { border-radius: 20px; font-weight: 700; }
+  .pirm-upvote-btn.voted { background: var(--safety-orange); border-color: var(--safety-orange); color: #fff; }
+  .pirm-progress-wrap .progress { height: 6px; border-radius: 4px; }
+  .pirm-progress-labels { display: flex; justify-content: space-between; font-size: 9.5px; text-transform: uppercase; color: #868e96; margin-top: 3px; }
+
+  .pirm-filter-bar { background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(36,38,43,0.06); padding: 14px 16px; }
+  .pirm-empty-state { text-align: center; padding: 50px 20px; color: #868e96; }
+
+  .auth-nav-btn { font-size: 13px; font-weight: 600; border-radius: 20px; padding: 6px 16px; text-decoration: none; }
 </style>
 </head>
 <body>
 
-<!-- Header Navigation Bar -->
-<nav class="navbar navbar-pirm navbar-dark py-3 mb-0">
-  <div class="container">
-    <a class="navbar-brand mb-0 h1 text-decoration-none" href="index.html"><i class="bi bi-cone-striped me-2"></i>PIRM</a>
+<!-- Navigation Bar with Integrated Page Links -->
+<nav class="navbar navbar-pirm navbar-dark py-3 mb-4">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a class="navbar-brand mb-0 h1 text-decoration-none" href="index.html">
+      <i class="bi bi-cone-striped me-2"></i>PIRM Citizen Portal
+    </a>
+    
     <div class="d-flex align-items-center gap-2">
-      <a href="userlogin.html" class="btn btn-pirm-nav btn-pirm-login"><i class="bi bi-box-arrow-in-right me-1"></i> Sign In</a>
-      <a href="register.html" class="btn btn-pirm-nav btn-pirm-register"><i class="bi bi-person-plus-fill me-1"></i> Register</a>
+      <span class="badge bg-success rounded-pill px-3 py-2 d-none d-md-inline-block me-2">
+        <i class="bi bi-broadcast-pin me-1"></i>Live tracking
+      </span>
+      
+      <!-- Links to userlogin.html, userregister.html & admindashboard.html -->
+      <a href="userlogin.html" class="btn btn-outline-light btn-sm auth-nav-btn">
+        <i class="bi bi-box-arrow-in-right me-1"></i>Login
+      </a>
+      <a href="userregister.html" class="btn btn-warning btn-sm text-dark auth-nav-btn fw-bold">
+        <i class="bi bi-person-plus-fill me-1"></i>Register
+      </a>
+      <a href="admindashboard.html" class="btn btn-outline-secondary btn-sm text-white auth-nav-btn ms-1" title="Admin Access">
+        <i class="bi bi-shield-lock-fill me-1"></i>Admin
+      </a>
     </div>
   </div>
 </nav>
 
-<!-- Hero Section -->
 <div class="pirm-hero">
   <div class="container">
-    <h1 class="pirm-display">Pothole &amp; Infrastructure Reporting Map</h1>
-    <p>A crowdsourced platform for reporting road damage, tracking fixes, and visualizing hotspots across the city. Select a portal below to get started.</p>
-    <p class="small">Citizens report road damage with a photo and location. Reports get upvoted, reviewed, and tracked from the moment they're filed to resolution.</p>
-
-    <div class="pirm-pipeline">
-      <div class="pirm-pipeline-step">
-        <div class="pirm-pipeline-dot" style="background: var(--caution-yellow); color: #24262b;"><i class="bi bi-flag-fill"></i></div>
-        <div class="pirm-pipeline-label"><b>Reported</b>Citizen files the issue</div>
-      </div>
-      <span class="pirm-pipeline-arrow">›</span>
-      <div class="pirm-pipeline-step">
-        <div class="pirm-pipeline-dot" style="background: var(--route-blue); color: #fff;"><i class="bi bi-eye-fill"></i></div>
-        <div class="pirm-pipeline-label"><b>Acknowledged</b>Admin reviews it</div>
-      </div>
-      <span class="pirm-pipeline-arrow">›</span>
-      <div class="pirm-pipeline-step">
-        <div class="pirm-pipeline-dot" style="background: var(--fixed-green); color: #fff;"><i class="bi bi-check-lg"></i></div>
-        <div class="pirm-pipeline-label"><b>Fixed</b>Issue resolved</div>
-      </div>
-    </div>
+    <h1 class="pirm-display">Report & Track Infrastructure Issues</h1>
+    <p>Snap a photo, tag the location, and let your neighbors upvote it so the city knows what to fix first.</p>
   </div>
 </div>
 
-<!-- Main Module Links Grid -->
-<div class="container my-5">
-  <div class="row g-4 justify-content-center">
+<div class="container mt-4">
 
-    <div class="col-md-6 col-lg-5">
-      <a href="userdashboard.html" class="pirm-module-card card">
-        <div class="card-body">
-          <div class="pirm-module-icon" style="background: var(--fixed-green);"><i class="bi bi-camera-fill"></i></div>
-          <h5 class="fw-bold">Citizen Portal</h5>
-          <p class="small text-muted mb-0">Report new potholes with photo + geotag, browse existing reports, and upvote the ones that matter most to you.</p>
-          <div class="pirm-module-owner">SCRUM-32 &middot; User Dashboard</div>
+  <!-- Report submission form -->
+  <div class="card pirm-form-card mb-4">
+    <div class="card-header"><i class="bi bi-camera-fill me-2"></i>Submit a New Report</div>
+    <div class="card-body p-4">
+      <form id="pirm-report-form">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Title</label>
+            <input type="text" class="form-control" id="pirm-in-title" placeholder="e.g. Large pothole near bus stop" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-semibold">Severity</label>
+            <select class="form-select" id="pirm-in-severity">
+              <option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-semibold">Road Type</label>
+            <select class="form-select" id="pirm-in-roadtype">
+              <option>Highway</option><option>Main Road</option><option selected>Residential Street</option><option>Service Lane</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold">Description</label>
+            <textarea class="form-control" id="pirm-in-desc" rows="2" placeholder="Add any details that would help — size, how long it's been there, nearby landmark..."></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Photo</label>
+            <div class="d-flex align-items-center gap-2">
+              <input type="file" class="form-control" id="pirm-in-photo" accept="image/*" capture="environment">
+              <img id="pirm-upload-preview" class="pirm-upload-preview" alt="preview">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Location</label>
+            <div class="d-flex align-items-center gap-2">
+              <button type="button" class="btn btn-pirm-geo" id="pirm-geo-btn"><i class="bi bi-geo-alt-fill me-1"></i>Use My Location</button>
+              <small id="pirm-geo-status" class="text-muted text-truncate">No location attached yet</small>
+            </div>
+          </div>
+          <div class="col-12 mt-2">
+            <button type="submit" class="btn btn-pirm-primary text-white px-4"><i class="bi bi-send-fill me-1"></i>Submit Report</button>
+            <small class="text-muted ms-2">Photo and location are optional here, but help the city prioritize.</small>
+          </div>
         </div>
-      </a>
+      </form>
     </div>
-
-    <div class="col-md-6 col-lg-5">
-      <a href="pothole2.html" class="pirm-module-card card">
-        <div class="card-body">
-          <div class="pirm-module-icon" style="background: var(--route-blue);"><i class="bi bi-geo-alt-fill"></i></div>
-          <h5 class="fw-bold">Hotspot Map</h5>
-          <p class="small text-muted mb-0">Geo-clustered view showing where reports concentrate across the city, so problem areas surface at a glance.</p>
-          <div class="pirm-module-owner">SCRUM-16 &middot; Map View with Clustering</div>
-        </div>
-      </a>
-    </div>
-
   </div>
-</div>
 
-<!-- Public Browse Section -->
-<div class="container mb-5">
-  <hr class="mb-5">
-  <p class="pirm-section-title"><i class="bi bi-list-ul me-2"></i>Browse Recent Reports</p>
-  <p class="pirm-section-sub">See what's already been reported near you. <a href="userlogin.html" class="text-decoration-underline text-dark fw-semibold">Sign in</a> to upvote or submit your own.</p>
-
-  <div class="pirm-filter-bar">
+  <!-- Filter bar -->
+  <div class="pirm-filter-bar mb-4">
     <div class="row g-2 align-items-center">
-      <div class="col-md-4">
+      <div class="col-md-5">
         <div class="input-group">
           <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
           <input type="text" class="form-control" id="pirm-search" placeholder="Search by title or location...">
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-3">
         <select class="form-select" id="pirm-filter-status">
           <option value="All">All Statuses</option>
           <option>Reported</option><option>Acknowledged</option><option>Fixed</option>
         </select>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-3">
         <select class="form-select" id="pirm-filter-severity">
           <option value="All">All Severities</option>
           <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
         </select>
       </div>
-      <div class="col-md-2">
-        <select class="form-select" id="pirm-sort">
-          <option value="newest">Sort: Newest</option>
-          <option value="upvotes">Sort: Most Upvoted</option>
-          <option value="severity">Sort: Severity (High→Low)</option>
-        </select>
-      </div>
-      <div class="col-md-2 text-md-end">
+      <div class="col-md-1 text-md-end">
         <span class="badge bg-secondary" id="pirm-result-count"></span>
       </div>
     </div>
   </div>
 
+  <!-- Reported Incidents List -->
   <div class="row g-4" id="pirm-report-grid"></div>
 </div>
 
-<script src="data.js"></script>
+<!-- Detailed Incident Review Modal -->
+<div class="modal fade" id="pirmDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="pirm-detail-body">
+      <!-- Populated Dynamically -->
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
 <script>
 (function() {
-  const reports = typeof PIRM_REPORTS !== 'undefined' ? PIRM_REPORTS : [];
-  let filters = { status: 'All', severity: 'All', search: '' };
-  let sortBy = 'newest';
-  reports.forEach((r, i) => { if (r.recency === undefined) r.recency = i; });
+  let reports = [
+    { id: 'PIRM-101', title: 'Deep pothole blocking left lane', description: 'A large pothole roughly 2 feet wide has formed near the signal, forcing vehicles to swerve into oncoming traffic.', severity: 'Critical', roadType: 'Main Road', status: 'Reported', location: 'MG Road, near Deccan signal', upvotes: 42, date: '2 days ago', photo: null },
+    { id: 'PIRM-106', title: 'Cracked road surface, cyclists at risk', description: 'Long cracks running along the service lane are catching bicycle tires, causing near-falls.', severity: 'High', roadType: 'Service Lane', status: 'Acknowledged', location: 'Baner Road service lane', upvotes: 33, date: '5 days ago', photo: null },
+    { id: 'PIRM-110', title: 'Pothole cluster, 4 reports in same block', description: 'Multiple potholes reported within the same stretch, suggesting a resurfacing issue rather than isolated damage.', severity: 'Critical', roadType: 'Highway', status: 'Reported', location: 'Hadapsar bypass', upvotes: 49, date: '2 days ago', photo: null },
+    { id: 'PIRM-111', title: 'Small pothole near residential gate', description: 'A shallow but widening pothole near house entrances, growing after recent rain.', severity: 'Low', roadType: 'Residential Street', status: 'Fixed', location: 'Kothrud Society Lane 3', upvotes: 11, date: '8 days ago', photo: null },
+    { id: 'PIRM-112', title: 'Pothole causing traffic slowdown at peak hours', description: 'Vehicles are braking suddenly to avoid it, causing minor pile-ups during rush hour.', severity: 'High', roadType: 'Main Road', status: 'Acknowledged', location: 'FC Road, near college gate', upvotes: 38, date: '3 days ago', photo: null },
+    { id: 'PIRM-113', title: 'Medium pothole, edge crumbling further', description: 'The pothole edges are crumbling further with each rainfall, expanding its diameter.', severity: 'Medium', roadType: 'Residential Street', status: 'Reported', location: 'Aundh Society Road', upvotes: 14, date: '4 days ago', photo: null },
+  ];
 
-  function progressPercent(status) { return { Reported: 15, Acknowledged: 55, Fixed: 100 }[status] || 0; }
-  function progressBarClass(status) { return { Reported: 'bg-warning', Acknowledged: 'bg-primary', Fixed: 'bg-success' }[status] || 'bg-secondary'; }
+  let filters = { status: 'All', severity: 'All', search: '' };
+  let votedIds = new Set();
+  let nextIdNum = 114;
+  let pendingPhoto = null;
+  let pendingCoords = null;
+
+  function progressPercent(status) {
+    return { Reported: 15, Acknowledged: 55, Fixed: 100 }[status];
+  }
+  function progressBarClass(status) {
+    return { Reported: 'bg-warning', Acknowledged: 'bg-primary', Fixed: 'bg-success' }[status];
+  }
 
   function cardHTML(r) {
     return `
       <div class="col-md-6 col-lg-4">
-        <div class="card pirm-report-card h-100">
+        <div class="card pirm-report-card h-100" data-detail-id="${r.id}">
           <div class="pirm-report-photo" style="${r.photo ? `background-image:url('${r.photo}')` : 'background:#495057'}">
             ${r.photo ? '' : '<i class="bi bi-cone-striped"></i>'}
           </div>
-          <div class="card-body d-flex flex-column">
+          <div class="card-body">
             <div class="d-flex flex-wrap gap-1 mb-2">
               <span class="badge pirm-severity-${r.severity}">${r.severity}</span>
               <span class="badge pirm-status-${r.status}">${r.status}</span>
               <span class="badge bg-light text-dark border">${r.roadType}</span>
             </div>
             <h6 class="fw-bold mb-1">${r.title}</h6>
+            <p class="small text-muted mb-2">${r.description || 'No additional details provided.'}</p>
             <p class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>${r.location} &nbsp;·&nbsp; <i class="bi bi-clock me-1"></i>${r.date}</p>
-            <div class="pirm-progress-wrap mb-3 mt-auto">
+            <div class="pirm-progress-wrap mb-3">
               <div class="progress"><div class="progress-bar ${progressBarClass(r.status)}" style="width:${progressPercent(r.status)}%"></div></div>
               <div class="pirm-progress-labels"><span>Reported</span><span>Ack'd</span><span>Fixed</span></div>
             </div>
             <div class="d-flex justify-content-between align-items-center">
-              <a href="userlogin.html" class="btn btn-outline-secondary btn-sm pirm-upvote-hint">
+              <button class="btn btn-outline-secondary btn-sm pirm-upvote-btn ${votedIds.has(r.id) ? 'voted' : ''}" data-vote-id="${r.id}">
                 <i class="bi bi-hand-thumbs-up-fill me-1"></i>${r.upvotes}
-              </a>
+              </button>
               <small class="text-muted">#${r.id}</small>
             </div>
           </div>
@@ -245,17 +240,12 @@
   }
 
   function render() {
-    let filtered = reports.filter(r => {
+    const filtered = reports.filter(r => {
       if (filters.status !== 'All' && r.status !== filters.status) return false;
       if (filters.severity !== 'All' && r.severity !== filters.severity) return false;
       if (filters.search && !(r.title + r.location).toLowerCase().includes(filters.search.toLowerCase())) return false;
       return true;
     });
-
-    const sevRank = { Critical: 4, High: 3, Medium: 2, Low: 1 };
-    if (sortBy === 'newest') filtered.sort((a, b) => b.recency - a.recency);
-    else if (sortBy === 'upvotes') filtered.sort((a, b) => b.upvotes - a.upvotes);
-    else if (sortBy === 'severity') filtered.sort((a, b) => sevRank[b.severity] - sevRank[a.severity]);
 
     document.getElementById('pirm-result-count').textContent = `${filtered.length}/${reports.length}`;
 
@@ -263,13 +253,112 @@
     grid.innerHTML = filtered.length === 0
       ? `<div class="col-12 pirm-empty-state"><i class="bi bi-inboxes fs-1 d-block mb-2"></i>No reports match your filters.</div>`
       : filtered.map(cardHTML).join('');
+
+    // Attach Upvote Click Handlers
+    grid.querySelectorAll('.pirm-upvote-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-vote-id');
+        const report = reports.find(r => r.id === id);
+        if (votedIds.has(id)) { votedIds.delete(id); report.upvotes -= 1; }
+        else { votedIds.add(id); report.upvotes += 1; }
+        render();
+      });
+    });
+
+    // Attach Modal Review Click Handlers
+    grid.querySelectorAll('[data-detail-id]').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.getAttribute('data-detail-id');
+        openDetailModal(id);
+      });
+    });
   }
 
+  function openDetailModal(id) {
+    const r = reports.find(x => x.id === id);
+    if (!r) return;
+
+    const modalBody = document.getElementById('pirm-detail-body');
+    modalBody.innerHTML = `
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">${r.title}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        ${r.photo ? `<img src="${r.photo}" class="img-fluid rounded mb-3" alt="Report image">` : ''}
+        <p class="text-muted small">${r.description || 'No additional description provided.'}</p>
+        <div class="row g-2">
+          <div class="col-6"><small class="text-muted d-block">Report ID</small><strong>${r.id}</strong></div>
+          <div class="col-6"><small class="text-muted d-block">Severity</small><span class="badge pirm-severity-${r.severity}">${r.severity}</span></div>
+          <div class="col-6"><small class="text-muted d-block">Road Type</small><strong>${r.roadType}</strong></div>
+          <div class="col-6"><small class="text-muted d-block">Status</small><span class="badge pirm-status-${r.status}">${r.status}</span></div>
+          <div class="col-12 mt-2"><small class="text-muted d-block">Location</small><strong><i class="bi bi-geo-alt me-1"></i>${r.location}</strong></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+      </div>
+    `;
+
+    const detailModal = new bootstrap.Modal(document.getElementById('pirmDetailModal'));
+    detailModal.show();
+  }
+
+  // Filter Event Listeners
   document.getElementById('pirm-search').addEventListener('input', e => { filters.search = e.target.value; render(); });
   document.getElementById('pirm-filter-status').addEventListener('change', e => { filters.status = e.target.value; render(); });
   document.getElementById('pirm-filter-severity').addEventListener('change', e => { filters.severity = e.target.value; render(); });
-  document.getElementById('pirm-sort').addEventListener('change', e => { sortBy = e.target.value; render(); });
 
+  // Upload Preview Event Listener
+  document.getElementById('pirm-in-photo').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      pendingPhoto = ev.target.result;
+      const preview = document.getElementById('pirm-upload-preview');
+      preview.src = pendingPhoto;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Geolocation Handler
+  document.getElementById('pirm-geo-btn').addEventListener('click', () => {
+    const statusEl = document.getElementById('pirm-geo-status');
+    if (!navigator.geolocation) { statusEl.textContent = 'Geolocation not supported'; return; }
+    statusEl.textContent = 'Detecting location...';
+    navigator.geolocation.getCurrentPosition(
+      pos => { pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; statusEl.textContent = `📍 ${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}`; },
+      () => { statusEl.textContent = 'Location access denied'; },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  });
+
+  // New Incident Report Handler
+  document.getElementById('pirm-report-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const title = document.getElementById('pirm-in-title').value.trim();
+    if (!title) return;
+    const severity = document.getElementById('pirm-in-severity').value;
+    const roadType = document.getElementById('pirm-in-roadtype').value;
+    const description = document.getElementById('pirm-in-desc').value.trim();
+    const locationText = pendingCoords ? `${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}` : 'Location not attached';
+
+    reports.unshift({
+      id: `PIRM-${nextIdNum++}`, title, description, severity, roadType,
+      status: 'Reported', location: locationText, upvotes: 0, date: 'Just now', photo: pendingPhoto
+    });
+
+    e.target.reset();
+    document.getElementById('pirm-upload-preview').style.display = 'none';
+    document.getElementById('pirm-geo-status').textContent = 'No location attached yet';
+    pendingPhoto = null; pendingCoords = null;
+    render();
+  });
+
+  // Initial Execution
   render();
 })();
 </script>
