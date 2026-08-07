@@ -51,10 +51,10 @@
       </form>
 
       <p class="text-center small text-muted mt-4 mb-1">
-        New here? <a href="user-register.html">Create an account</a>
+        New here? <a href="userregister.html">Create an account</a>
       </p>
       <p class="text-center small text-muted mb-0">
-        <a href="admin-dashboard-potholes.html">Are you a municipal admin? Sign in here</a>
+        <a href="admindashboard.html">Are you a municipal admin? Sign in here</a>
       </p>
     </div>
   </div>
@@ -85,7 +85,7 @@
     // so any well-formed email + password combination is accepted for now.
     // Once the backend is ready, this becomes a real authentication call.
     const displayName = params.get('name') || email.split('@')[0];
-    window.location.href = `user-dashboard-bootstrap.html?name=${encodeURIComponent(displayName)}`;
+    window.location.href = `userdashboard.html?name=${encodeURIComponent(displayName)}`;
   });
 </script>
 </body>
