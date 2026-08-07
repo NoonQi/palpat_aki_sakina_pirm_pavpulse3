@@ -8,35 +8,109 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --asphalt: #24262b; --safety-orange: #e8590c; --route-blue: #1971c2; --fixed-green: #2f9e44; }
-  :root { --asphalt: #24262b; --safety-orange: #e8590c; --route-blue: #1971c2; --fixed-green: #2f9e44; --caution-yellow: #f5b700; }
+  :root { 
+    --asphalt: #24262b; 
+    --safety-orange: #e8590c; 
+    --route-blue: #1971c2; 
+    --fixed-green: #2f9e44; 
+    --caution-yellow: #f5b700;
+  }
   body { font-family: 'Inter', sans-serif; background: #f2efe8; }
   .pirm-display { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; }
+  
+  /* Navbar Styling */
   .navbar-pirm { background: var(--asphalt); }
-  .navbar-pirm .navbar-brand { color: #fff; font-family: 'Oswald', sans-serif; font-weight: 600; }
+  .navbar-pirm .navbar-brand { color: #fff; font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 1.35rem; }
   .navbar-pirm .navbar-brand i { color: var(--safety-orange); }
+  
+  .btn-pirm-nav {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  .btn-pirm-login {
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    background: transparent;
+  }
+  .btn-pirm-login:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border-color: #fff;
+  }
+  .btn-pirm-register {
+    background: var(--safety-orange);
+    color: #fff;
+    border: none;
+  }
+  .btn-pirm-register:hover {
+    background: #d04d08;
+    color: #fff;
+  }
+
+  /* Hero & Pipeline */
   .pirm-hero { background: var(--asphalt); color: #fff; padding: 50px 0 60px; }
-  .pirm-hero p { color: #c9cbd1; max-width: 560px; }
-  .pirm-module-card { border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(36,38,43,0.1); height: 100%; transition: transform .15s ease; text-decoration: none; color: inherit; display: block; }
-  .pirm-module-card:hover { transform: translateY(-4px); color: inherit; }
+  .pirm-hero p { color: #c9cbd1; max-width: 580px; }
+  .pirm-pipeline { display: flex; align-items: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .pirm-pipeline-step { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.06); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+  .pirm-pipeline-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; flex-shrink: 0; }
+  .pirm-pipeline-label { font-size: 12px; line-height: 1.2; }
+  .pirm-pipeline-label b { display: block; font-size: 13px; }
+  .pirm-pipeline-arrow { color: #6c757d; font-size: 18px; }
+
+  /* Cards */
+  .pirm-module-card { border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(36,38,43,0.08); height: 100%; transition: transform .15s ease, box-shadow .15s ease; text-decoration: none; color: inherit; display: block; background: #fff; }
+  .pirm-module-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(36,38,43,0.12); color: inherit; }
   .pirm-module-icon { width: 52px; height: 52px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; margin-bottom: 14px; }
   .pirm-module-card .card-body { padding: 26px; }
-  .pirm-module-owner { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: #868e96; margin-top: 10px; }
+  .pirm-module-owner { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: #868e96; margin-top: 14px; }
+
+  /* Browse & Filter Section */
+  .pirm-section-title { font-family: 'Oswald', sans-serif; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 2px; }
+  .pirm-section-sub { font-size: 13.5px; color: #6c757d; margin-bottom: 20px; }
+  .pirm-filter-bar { background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 24px; }
+  
+  /* Report Card */
+  .pirm-report-card { border: none; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); overflow: hidden; }
+  .pirm-report-photo { height: 160px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 32px; }
+  .pirm-progress-wrap .progress { height: 6px; border-radius: 10px; background-color: #e9ecef; }
+  .pirm-progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: #868e96; margin-top: 4px; text-transform: uppercase; }
+  
+  /* Status Badges */
+  .pirm-severity-Critical { background-color: #e03131; color: #fff; }
+  .pirm-severity-High { background-color: #f08c00; color: #fff; }
+  .pirm-severity-Medium { background-color: #f5b700; color: #24262b; }
+  .pirm-severity-Low { background-color: #868e96; color: #fff; }
+  
+  .pirm-status-Reported { background-color: #f5b700; color: #24262b; }
+  .pirm-status-Acknowledged { background-color: #1971c2; color: #fff; }
+  .pirm-status-Fixed { background-color: #2f9e44; color: #fff; }
+
+  .pirm-empty-state { text-align: center; padding: 60px 20px; color: #868e96; }
 </style>
 </head>
 <body>
 
+<!-- Header Navigation Bar -->
 <nav class="navbar navbar-pirm navbar-dark py-3 mb-0">
   <div class="container">
-    <span class="navbar-brand mb-0 h1"><i class="bi bi-cone-striped me-2"></i>PIRM</span>
+    <a class="navbar-brand mb-0 h1 text-decoration-none" href="index.html"><i class="bi bi-cone-striped me-2"></i>PIRM</a>
+    <div class="d-flex align-items-center gap-2">
+      <a href="userlogin.html" class="btn btn-pirm-nav btn-pirm-login"><i class="bi bi-box-arrow-in-right me-1"></i> Sign In</a>
+      <a href="register.html" class="btn btn-pirm-nav btn-pirm-register"><i class="bi bi-person-plus-fill me-1"></i> Register</a>
+    </div>
   </div>
 </nav>
 
+<!-- Hero Section -->
 <div class="pirm-hero">
   <div class="container">
     <h1 class="pirm-display">Pothole &amp; Infrastructure Reporting Map</h1>
-    <p>A crowdsourced platform for reporting road damage, tracking fixes, and visualizing hotspots across the city. Pick a module below.</p>
-    <p>Citizens report road damage with a photo and location. Reports get upvoted, reviewed, and tracked from the moment they're filed to the moment they're fixed.</p>
+    <p>A crowdsourced platform for reporting road damage, tracking fixes, and visualizing hotspots across the city. Select a portal below to get started.</p>
+    <p class="small">Citizens report road damage with a photo and location. Reports get upvoted, reviewed, and tracked from the moment they're filed to resolution.</p>
 
     <div class="pirm-pipeline">
       <div class="pirm-pipeline-step">
@@ -45,22 +119,23 @@
       </div>
       <span class="pirm-pipeline-arrow">›</span>
       <div class="pirm-pipeline-step">
-        <div class="pirm-pipeline-dot" style="background: var(--route-blue);"><i class="bi bi-eye-fill"></i></div>
+        <div class="pirm-pipeline-dot" style="background: var(--route-blue); color: #fff;"><i class="bi bi-eye-fill"></i></div>
         <div class="pirm-pipeline-label"><b>Acknowledged</b>Admin reviews it</div>
       </div>
       <span class="pirm-pipeline-arrow">›</span>
       <div class="pirm-pipeline-step">
-        <div class="pirm-pipeline-dot" style="background: var(--fixed-green);"><i class="bi bi-check-lg"></i></div>
+        <div class="pirm-pipeline-dot" style="background: var(--fixed-green); color: #fff;"><i class="bi bi-check-lg"></i></div>
         <div class="pirm-pipeline-label"><b>Fixed</b>Issue resolved</div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Main Module Links Grid -->
 <div class="container my-5">
-  <div class="row g-4">
+  <div class="row g-4 justify-content-center">
 
-    <div class="col-md-4">
+    <div class="col-md-6 col-lg-5">
       <a href="userdashboard.html" class="pirm-module-card card">
         <div class="card-body">
           <div class="pirm-module-icon" style="background: var(--fixed-green);"><i class="bi bi-camera-fill"></i></div>
@@ -71,18 +146,7 @@
       </a>
     </div>
 
-    <div class="col-md-4">
-      <a href="admindashboard.html" class="pirm-module-card card">
-        <div class="card-body">
-          <div class="pirm-module-icon" style="background: var(--safety-orange);"><i class="bi bi-clipboard-data-fill"></i></div>
-          <h5 class="fw-bold">Admin Console</h5>
-          <p class="small text-muted mb-0">Review incoming reports, update status, add internal notes, and track resolution analytics.</p>
-          <div class="pirm-module-owner">SCRUM-27 &middot; Admin Dashboard</div>
-        </div>
-      </a>
-    </div>
-
-    <div class="col-md-4">
+    <div class="col-md-6 col-lg-5">
       <a href="pothole2.html" class="pirm-module-card card">
         <div class="card-body">
           <div class="pirm-module-icon" style="background: var(--route-blue);"><i class="bi bi-geo-alt-fill"></i></div>
@@ -96,14 +160,11 @@
   </div>
 </div>
 
-  </div>
-</div>
-
-<!-- Public browse section -->
+<!-- Public Browse Section -->
 <div class="container mb-5">
   <hr class="mb-5">
   <p class="pirm-section-title"><i class="bi bi-list-ul me-2"></i>Browse Recent Reports</p>
-  <p class="pirm-section-sub">See what's already been reported near you. <a href="userlogin.html">Sign in</a> to upvote or submit your own.</p>
+  <p class="pirm-section-sub">See what's already been reported near you. <a href="userlogin.html" class="text-decoration-underline text-dark fw-semibold">Sign in</a> to upvote or submit your own.</p>
 
   <div class="pirm-filter-bar">
     <div class="row g-2 align-items-center">
@@ -144,13 +205,13 @@
 <script src="data.js"></script>
 <script>
 (function() {
-  const reports = PIRM_REPORTS;
+  const reports = typeof PIRM_REPORTS !== 'undefined' ? PIRM_REPORTS : [];
   let filters = { status: 'All', severity: 'All', search: '' };
   let sortBy = 'newest';
   reports.forEach((r, i) => { if (r.recency === undefined) r.recency = i; });
 
-  function progressPercent(status) { return { Reported: 15, Acknowledged: 55, Fixed: 100 }[status]; }
-  function progressBarClass(status) { return { Reported: 'bg-warning', Acknowledged: 'bg-primary', Fixed: 'bg-success' }[status]; }
+  function progressPercent(status) { return { Reported: 15, Acknowledged: 55, Fixed: 100 }[status] || 0; }
+  function progressBarClass(status) { return { Reported: 'bg-warning', Acknowledged: 'bg-primary', Fixed: 'bg-success' }[status] || 'bg-secondary'; }
 
   function cardHTML(r) {
     return `
@@ -159,7 +220,7 @@
           <div class="pirm-report-photo" style="${r.photo ? `background-image:url('${r.photo}')` : 'background:#495057'}">
             ${r.photo ? '' : '<i class="bi bi-cone-striped"></i>'}
           </div>
-          <div class="card-body">
+          <div class="card-body d-flex flex-column">
             <div class="d-flex flex-wrap gap-1 mb-2">
               <span class="badge pirm-severity-${r.severity}">${r.severity}</span>
               <span class="badge pirm-status-${r.status}">${r.status}</span>
@@ -167,12 +228,12 @@
             </div>
             <h6 class="fw-bold mb-1">${r.title}</h6>
             <p class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>${r.location} &nbsp;·&nbsp; <i class="bi bi-clock me-1"></i>${r.date}</p>
-            <div class="pirm-progress-wrap mb-3">
+            <div class="pirm-progress-wrap mb-3 mt-auto">
               <div class="progress"><div class="progress-bar ${progressBarClass(r.status)}" style="width:${progressPercent(r.status)}%"></div></div>
               <div class="pirm-progress-labels"><span>Reported</span><span>Ack'd</span><span>Fixed</span></div>
             </div>
             <div class="d-flex justify-content-between align-items-center">
-              <a href="user-login.html" class="btn btn-outline-secondary btn-sm pirm-upvote-hint">
+              <a href="userlogin.html" class="btn btn-outline-secondary btn-sm pirm-upvote-hint">
                 <i class="bi bi-hand-thumbs-up-fill me-1"></i>${r.upvotes}
               </a>
               <small class="text-muted">#${r.id}</small>
