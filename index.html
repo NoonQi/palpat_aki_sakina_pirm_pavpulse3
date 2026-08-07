@@ -4,163 +4,336 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PIRM — Citizen Portal</title>
+
+<!-- Bootstrap & Icons -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Leaflet CSS & MarkerCluster CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
+
 <style>
   :root {
-    --asphalt: #24262b;
-    --safety-orange: #e8590c;
-    --route-blue: #1971c2;
-    --fixed-green: #2f9e44;
-    --caution-yellow: #f5b700;
+    --asphalt: #131722;
+    --asphalt-card: #1c212d;
+    --safety-orange: #ff6b35;
+    --safety-orange-hover: #e85a26;
+    --route-blue: #2563eb;
+    --fixed-green: #10b981;
+    --caution-yellow: #f59e0b;
+    --low: #10b981; 
+    --med: #f59e0b; 
+    --high: #ef4444;
   }
-  body { font-family: 'Inter', sans-serif; background: #f2efe8; padding-bottom: 60px; }
-  .pirm-display { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; }
-  .navbar-pirm { background: var(--asphalt); }
-  .navbar-pirm .navbar-brand { color: #fff; font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: 0.02em; }
+  
+  body { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    background: #f8fafc; 
+    padding-bottom: 80px; 
+    color: #334155;
+  }
+
+  .pirm-display { 
+    font-family: 'Oswald', sans-serif; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+  }
+
+  /* Navigation Bar */
+  .navbar-pirm { 
+    background: var(--asphalt); 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+  }
+  .navbar-pirm .navbar-brand { 
+    color: #fff; 
+    font-family: 'Oswald', sans-serif; 
+    font-weight: 600; 
+    font-size: 1.5rem;
+  }
   .navbar-pirm .navbar-brand i { color: var(--safety-orange); }
 
-  .pirm-hero { background: var(--asphalt); color: #fff; padding: 34px 0 42px; margin-bottom: -26px; }
-  .pirm-hero h1 { font-size: 26px; }
-  .pirm-hero p { color: #c9cbd1; font-size: 14px; max-width: 560px; }
+  /* Hero Section */
+  .pirm-hero { 
+    background: radial-gradient(circle at 10% 20%, #202738 0%, var(--asphalt) 90%); 
+    color: #fff; 
+    padding: 50px 0 65px; 
+    margin-bottom: -35px; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .pirm-hero h1 { font-size: 2.4rem; font-weight: 700; }
+  .pirm-hero p { color: #94a3b8; font-size: 1rem; max-width: 600px; line-height: 1.6; }
 
-  .pirm-form-card { border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(36,38,43,0.12); }
-  .pirm-form-card .card-header { background: var(--safety-orange); color: #fff; font-weight: 600; border-radius: 12px 12px 0 0 !important; padding: 14px 20px; }
-  .pirm-upload-preview { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; display: none; }
-  .btn-pirm-primary { background: var(--fixed-green); border-color: var(--fixed-green); font-weight: 600; }
-  .btn-pirm-primary:hover { background: #268a3d; border-color: #268a3d; }
-  .btn-pirm-geo { background: var(--safety-orange); border-color: var(--safety-orange); color: #fff; font-weight: 600; font-size: 13px; }
-  .btn-pirm-geo:hover { background: #d14e0a; color: #fff; }
+  /* Severity & Status Badges */
+  .badge-pirm {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .pirm-severity-Low { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+  .pirm-severity-Medium { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+  .pirm-severity-High { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+  .pirm-severity-Critical { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
-  .pirm-severity-Low { background: #868e96; }
-  .pirm-severity-Medium { background: var(--caution-yellow); color: #24262b !important; }
-  .pirm-severity-High { background: #f08c00; }
-  .pirm-severity-Critical { background: #e03131; }
-  .pirm-status-Reported { background: var(--caution-yellow); color: #24262b !important; }
-  .pirm-status-Acknowledged { background: var(--route-blue); }
-  .pirm-status-Fixed { background: var(--fixed-green); }
+  .pirm-status-Reported { background: #fffbeeb0; color: #b45309; border: 1px solid #fde68a; }
+  .pirm-status-Acknowledged { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .pirm-status-Fixed { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
 
-  .pirm-report-card { border: none; border-radius: 10px; box-shadow: 0 4px 14px rgba(36,38,43,0.08); overflow: hidden; transition: transform .12s ease; cursor: pointer; }
-  .pirm-report-card:hover { transform: translateY(-2px); }
-  .pirm-report-photo { height: 140px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; }
-  .pirm-upvote-btn { border-radius: 20px; font-weight: 700; }
-  .pirm-upvote-btn.voted { background: var(--safety-orange); border-color: var(--safety-orange); color: #fff; }
-  .pirm-progress-wrap .progress { height: 6px; border-radius: 4px; }
-  .pirm-progress-labels { display: flex; justify-content: space-between; font-size: 9.5px; text-transform: uppercase; color: #868e96; margin-top: 3px; }
+  /* Incident Cards Styling */
+  .pirm-report-card { 
+    border: 1px solid #e2e8f0; 
+    border-radius: 16px; 
+    box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03); 
+    overflow: hidden; 
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+    cursor: pointer; 
+    background: #ffffff;
+  }
+  .pirm-report-card:hover { 
+    transform: translateY(-6px); 
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    border-color: #cbd5e1;
+  }
 
-  .pirm-filter-bar { background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(36,38,43,0.06); padding: 14px 16px; }
-  .pirm-empty-state { text-align: center; padding: 50px 20px; color: #868e96; }
+  /* Image Container Styling */
+  .pirm-report-photo-wrapper {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: #0f172a;
+  }
+  .pirm-report-photo { 
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .pirm-report-card:hover .pirm-report-photo {
+    transform: scale(1.05);
+  }
+  .pirm-photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: #1e293b;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .pirm-photo-placeholder i {
+    font-size: 38px;
+    color: var(--safety-orange);
+    margin-bottom: 6px;
+  }
 
-  .auth-nav-btn { font-size: 13px; font-weight: 600; border-radius: 20px; padding: 6px 16px; text-decoration: none; }
+  /* Upvote Button */
+  .pirm-upvote-btn { 
+    border-radius: 20px; 
+    font-weight: 600; 
+    padding: 5px 16px;
+    font-size: 12px;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+  }
+  .pirm-upvote-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+  .pirm-upvote-btn.voted { 
+    background: var(--safety-orange); 
+    border-color: var(--safety-orange); 
+    color: #fff; 
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  }
+
+  /* Progress Bar */
+  .pirm-progress-wrap .progress { height: 6px; border-radius: 10px; background-color: #f1f5f9; overflow: hidden; }
+  .pirm-progress-labels { display: flex; justify-content: space-between; font-size: 10px; text-transform: uppercase; color: #94a3b8; margin-top: 6px; font-weight: 700; letter-spacing: 0.02em; }
+
+  /* Filters Bar */
+  .pirm-filter-bar { 
+    background: #fff; 
+    border-radius: 16px; 
+    box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03); 
+    padding: 18px 24px; 
+    border: 1px solid #e2e8f0;
+  }
+  .pirm-filter-bar .form-control, .pirm-filter-bar .form-select {
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 14px;
+    padding: 9px 14px;
+  }
+  .pirm-filter-bar .form-control:focus, .pirm-filter-bar .form-select:focus {
+    border-color: var(--safety-orange);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+  }
+
+  /* Map Container */
+  .map-card-wrapper {
+    border-radius: 16px;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+  }
+  .map-header-bar {
+    background: var(--asphalt);
+    color: #fff;
+    padding: 16px 24px;
+  }
+  #map {
+    height: 400px;
+    width: 100%;
+    background: #0c1015;
+    z-index: 1;
+  }
+
+  /* Clusters & Pulse */
+  .cluster-icon { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-weight: 800; 
+    font-size: 13px; 
+    color: #ffffff; 
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.4); 
+    transition: transform 0.2s ease;
+  }
+  .cluster-low  { background: linear-gradient(135deg, #10b981, #059669); }
+  .cluster-med  { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .cluster-high { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+  .report-dot { 
+    width: 14px; 
+    height: 14px; 
+    border-radius: 50%; 
+    border: 2px solid rgba(255,255,255,0.9); 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    animation: pulse-dot 2s infinite;
+  }
+
+  @keyframes pulse-dot {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+  }
+
+  .leaflet-popup-content-wrapper { background: #1e293b; color: #f8fafc; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+  .leaflet-popup-tip { background: #1e293b; }
 </style>
 </head>
 <body>
 
-<!-- Main Navigation Bar -->
-<nav class="navbar navbar-pirm navbar-dark py-3 mb-4">
+<!-- Main Navigation Bar
+<nav class="navbar navbar-pirm navbar-dark py-3 mb-4 sticky-top">
   <div class="container d-flex justify-content-between align-items-center">
-    <a class="navbar-brand mb-0 h1 text-decoration-none" href="index.html">
-      <i class="bi bi-cone-striped me-2"></i>PIRM Citizen Portal
+    <a class="navbar-brand mb-0 text-decoration-none d-flex align-items-center" href="#">
+      <i class="bi bi-cone-striped me-2 fs-4"></i>PIRM Citizen Portal
     </a>
     
-    <div class="d-flex align-items-center gap-2" id="nav-auth-container">
-      <span class="badge bg-success rounded-pill px-3 py-2 d-none d-md-inline-block me-2">
-        <i class="bi bi-broadcast-pin me-1"></i>Live tracking
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 d-none d-md-inline-block me-2 fw-semibold">
+        <i class="bi bi-broadcast-pin me-1"></i>Live tracking active
       </span>
       
-      <!-- Login & Register Actions -->
-      <a href="userlogin.html" class="btn btn-outline-light btn-sm auth-nav-btn">
+      <a href="userlogin.html" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-semibold">
         <i class="bi bi-box-arrow-in-right me-1"></i>Log In
       </a>
-      <a href="userregister.html" class="btn btn-warning btn-sm text-dark auth-nav-btn fw-bold">
+      <a href="userregister.html" class="btn btn-warning btn-sm text-dark rounded-pill px-3 fw-bold" style="background-color: var(--safety-orange); border: none; color: #fff !important;">
+        <i class="bi bi-person-plus-fill me-1"></i>Register
+      </a>
+    </div>
+  </div>
+</nav>
+ -->
+<!-- Main Navigation Bar -->
+<nav class="navbar navbar-pirm navbar-dark py-3 mb-4 sticky-top">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a class="navbar-brand mb-0 text-decoration-none d-flex align-items-center" href="#">
+      <i class="bi bi-cone-striped me-2 fs-4"></i>PIRM Citizen Portal
+    </a>
+    
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge rounded-pill px-3 py-2 me-2 fw-semibold d-inline-flex align-items-center" style="background-color: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+        <i class="bi bi-broadcast-pin me-1"></i>Live tracking active
+      </span>
+      
+      <a href="userlogin.html" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-semibold">
+        <i class="bi bi-box-arrow-in-right me-1"></i>Log In
+      </a>
+      <a href="userregister.html" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold" style="background-color: var(--safety-orange); border: none; color: #fff !important;">
         <i class="bi bi-person-plus-fill me-1"></i>Register
       </a>
     </div>
   </div>
 </nav>
 
+<!-- Hero Section -->
 <div class="pirm-hero">
   <div class="container">
-    <h1 class="pirm-display">Report & Track Infrastructure Issues</h1>
-    <p>Snap a photo, tag the location, and let your neighbors upvote it so the city knows what to fix first.</p>
+    <h1 class="pirm-display">Report & Track Road Hazards</h1>
+    <p>Snap a photo, tag the location, and let your community upvote issues so municipal teams can prioritize fixes faster.</p>
   </div>
 </div>
 
 <div class="container mt-4">
 
-  <!-- Submit Report Card -->
-  <div class="card pirm-form-card mb-4">
-    <div class="card-header"><i class="bi bi-camera-fill me-2"></i>Submit a New Report</div>
-    <div class="card-body p-4">
-      <form id="pirm-report-form">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label small fw-semibold">Title</label>
-            <input type="text" class="form-control" id="pirm-in-title" placeholder="e.g. Large pothole near bus stop" required>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label small fw-semibold">Severity</label>
-            <select class="form-select" id="pirm-in-severity">
-              <option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label small fw-semibold">Road Type</label>
-            <select class="form-select" id="pirm-in-roadtype">
-              <option>Highway</option><option>Main Road</option><option selected>Residential Street</option><option>Service Lane</option>
-            </select>
-          </div>
-          <div class="col-12">
-            <label class="form-label small fw-semibold">Description</label>
-            <textarea class="form-control" id="pirm-in-desc" rows="2" placeholder="Add any details that would help — size, how long it's been there, nearby landmark..."></textarea>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label small fw-semibold">Photo</label>
-            <div class="d-flex align-items-center gap-2">
-              <input type="file" class="form-control" id="pirm-in-photo" accept="image/*" capture="environment">
-              <img id="pirm-upload-preview" class="pirm-upload-preview" alt="preview">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label small fw-semibold">Location</label>
-            <div class="d-flex align-items-center gap-2">
-              <button type="button" class="btn btn-pirm-geo" id="pirm-geo-btn"><i class="bi bi-geo-alt-fill me-1"></i>Use My Location</button>
-              <small id="pirm-geo-status" class="text-muted text-truncate">No location attached yet</small>
-            </div>
-          </div>
-          <div class="col-12 mt-2">
-            <button type="submit" class="btn btn-pirm-primary text-white px-4"><i class="bi bi-send-fill me-1"></i>Submit Report</button>
-            <small class="text-muted ms-2">Photo and location are optional here, but help the city prioritize.</small>
-          </div>
+  <!-- Interactive Map Module -->
+  <div class="map-card-wrapper mb-4">
+    <div class="map-header-bar d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-map-fill text-warning fs-5"></i>
+        <h6 class="pirm-display mb-0 text-white">Citywide Pothole Cluster Map</h6>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3 small text-white-50 fw-semibold" style="font-size: 12px;">
+          <span><i class="bi bi-circle-fill me-1" style="color:var(--high);"></i>High Severity</span>
+          <span><i class="bi bi-circle-fill me-1" style="color:var(--med);"></i>Medium</span>
+          <span><i class="bi bi-circle-fill me-1" style="color:var(--low);"></i>Low</span>
         </div>
-      </form>
+        <a href="pothole2.html" class="btn btn-sm btn-outline-light rounded-pill ms-2" style="font-size: 12px; font-weight: 600;">
+          <i class="bi bi-box-arrow-up-right me-1"></i>Open Dedicated View
+        </a>
+      </div>
     </div>
+    <div id="map"></div>
   </div>
 
   <!-- Filter & Search Bar -->
   <div class="pirm-filter-bar mb-4">
-    <div class="row g-2 align-items-center">
+    <div class="row g-3 align-items-center">
       <div class="col-md-5">
         <div class="input-group">
-          <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-          <input type="text" class="form-control" id="pirm-search" placeholder="Search by title or location...">
+          <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+          <input type="text" class="form-control bg-light border-start-0" id="pirm-search" placeholder="Search by title or location...">
         </div>
       </div>
       <div class="col-md-3">
-        <select class="form-select" id="pirm-filter-status">
+        <select class="form-select bg-light" id="pirm-filter-status">
           <option value="All">All Statuses</option>
           <option>Reported</option><option>Acknowledged</option><option>Fixed</option>
         </select>
       </div>
       <div class="col-md-3">
-        <select class="form-select" id="pirm-filter-severity">
+        <select class="form-select bg-light" id="pirm-filter-severity">
           <option value="All">All Severities</option>
           <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
         </select>
       </div>
       <div class="col-md-1 text-md-end">
-        <span class="badge bg-secondary" id="pirm-result-count"></span>
+        <span class="badge bg-dark rounded-pill px-3 py-2 fw-bold" id="pirm-result-count">0/0</span>
       </div>
     </div>
   </div>
@@ -169,34 +342,109 @@
   <div class="row g-4" id="pirm-report-grid"></div>
 </div>
 
-<!-- Detailed Incident Review Modal -->
+<!-- Detailed Incident Modal -->
 <div class="modal fade" id="pirmDetailModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" id="pirm-detail-body">
-      <!-- Dynamically Populated -->
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;" id="pirm-detail-body">
+      <!-- Dynamic Content -->
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 
 <script>
 (function() {
-  // Sample Incidents matched directly with Admin Dashboard
   let reports = [
-    { id: 'PIRM-101', title: 'Deep pothole blocking left lane', description: 'A large pothole roughly 2 feet wide has formed near the signal, forcing vehicles to swerve into oncoming traffic.', severity: 'Critical', roadType: 'Main Road', status: 'Reported', location: 'MG Road, near Deccan signal', upvotes: 42, date: '2 days ago', photo: null },
-    { id: 'PIRM-106', title: 'Cracked road surface, cyclists at risk', description: 'Long cracks running along the service lane are catching bicycle tires, causing near-falls.', severity: 'High', roadType: 'Service Lane', status: 'Acknowledged', location: 'Baner Road service lane', upvotes: 33, date: '5 days ago', photo: null },
-    { id: 'PIRM-110', title: 'Pothole cluster, 4 reports in same block', description: 'Multiple potholes reported within the same stretch, suggesting a resurfacing issue rather than isolated damage.', severity: 'Critical', roadType: 'Highway', status: 'Reported', location: 'Hadapsar bypass', upvotes: 49, date: '2 days ago', photo: null },
-    { id: 'PIRM-111', title: 'Small pothole near residential gate', description: 'A shallow but widening pothole near house entrances, growing after recent rain.', severity: 'Low', roadType: 'Residential Street', status: 'Fixed', location: 'Kothrud Society Lane 3', upvotes: 11, date: '8 days ago', photo: null },
-    { id: 'PIRM-112', title: 'Pothole causing traffic slowdown at peak hours', description: 'Vehicles are braking suddenly to avoid it, causing minor pile-ups during rush hour.', severity: 'High', roadType: 'Main Road', status: 'Acknowledged', location: 'FC Road, near college gate', upvotes: 38, date: '3 days ago', photo: null },
-    { id: 'PIRM-113', title: 'Medium pothole, edge crumbling further', description: 'The pothole edges are crumbling further with each rainfall, expanding its diameter.', severity: 'Medium', roadType: 'Residential Street', status: 'Reported', location: 'Aundh Society Road', upvotes: 14, date: '4 days ago', photo: null },
+    { 
+      id: 'PIRM-101', 
+      title: 'Deep pothole blocking left lane', 
+      description: 'A large pothole roughly 2 feet wide has formed near the signal, forcing vehicles to swerve into oncoming traffic.', 
+      severity: 'Critical', 
+      roadType: 'Main Road', 
+      status: 'Reported', 
+      location: 'MG Road, near Deccan signal', 
+      lat: 18.5167, lng: 73.8412, 
+      upvotes: 42, 
+      date: '2 days ago', 
+      photo: 'imgpotholes/pothole1.jpg' 
+    },
+    { 
+      id: 'PIRM-106', 
+      title: 'Cracked road surface & deep crater', 
+      description: 'Long cracks running along the service lane expanding into a crater catching bicycle and scooter tires.', 
+      severity: 'High', 
+      roadType: 'Service Lane', 
+      status: 'Acknowledged', 
+      location: 'Baner Road service lane', 
+      lat: 18.5590, lng: 73.7868, 
+      upvotes: 33, 
+      date: '5 days ago', 
+      photo: 'imgpotholes/pothole2.jpg' 
+    },
+    { 
+      id: 'PIRM-110', 
+      title: 'Pothole cluster on main highway', 
+      description: 'Multiple asphalt breakages reported within the same stretch, suggesting a resurfacing issue rather than isolated damage.', 
+      severity: 'Critical', 
+      roadType: 'Highway', 
+      status: 'Reported', 
+      location: 'Hadapsar bypass', 
+      lat: 18.5089, lng: 73.9260, 
+      upvotes: 49, 
+      date: '2 days ago', 
+      photo: 'imgpotholes/potholehigh.jpg' 
+    },
+    { 
+      id: 'PIRM-111', 
+      title: 'Submerged pothole after rain', 
+      description: 'A hidden pit near house entrances filled with standing water, growing after recent rain.', 
+      severity: 'Low', 
+      roadType: 'Residential Street', 
+      status: 'Fixed', 
+      location: 'Kothrud Society Lane 3', 
+      lat: 18.5074, lng: 73.8077, 
+      upvotes: 11, 
+      date: '8 days ago', 
+      photo: 'imgpotholes/pothole3.jpg' 
+    },
+    { 
+      id: 'PIRM-112', 
+      title: 'Pothole causing traffic slowdown', 
+      description: 'Vehicles are braking suddenly to avoid it, causing minor pile-ups during rush hour.', 
+      severity: 'High', 
+      roadType: 'Main Road', 
+      status: 'Acknowledged', 
+      location: 'FC Road, near college gate', 
+      lat: 18.5220, lng: 73.8418, 
+      upvotes: 38, 
+      date: '3 days ago', 
+      photo: 'imgpotholes/pothole5.jpg' 
+    },
+    { 
+      id: 'PIRM-113', 
+      title: 'Medium pothole with crumbling edges', 
+      description: 'The pothole edges are crumbling further with each rainfall, expanding its diameter.', 
+      severity: 'Medium', 
+      roadType: 'Residential Street', 
+      status: 'Reported', 
+      location: 'Aundh Society Road', 
+      lat: 18.5601, lng: 73.8031, 
+      upvotes: 14, 
+      date: '4 days ago', 
+      photo: 'imgpotholes/potholecyc.jpg' 
+    }
   ];
 
   let filters = { status: 'All', severity: 'All', search: '' };
   let votedIds = new Set();
-  let nextIdNum = 114;
-  let pendingPhoto = null;
-  let pendingCoords = null;
+  let map, clusterGroup;
+  const markerById = {};
+
+  const priorityColor = { Low: "#10b981", Medium: "#f59e0b", High: "#ef4444", Critical: "#dc2626" };
+  const priorityRank = { Low: 0, Medium: 1, High: 2, Critical: 3 };
 
   function progressPercent(status) {
     return { Reported: 15, Acknowledged: 55, Fixed: 100 }[status];
@@ -205,31 +453,147 @@
     return { Reported: 'bg-warning', Acknowledged: 'bg-primary', Fixed: 'bg-success' }[status];
   }
 
+  function createClusterIcon(cluster) {
+    const markers = cluster.getAllChildMarkers();
+    let maxPriority = "Low";
+    markers.forEach(m => {
+      if (priorityRank[m.options.priority] > priorityRank[maxPriority]) maxPriority = m.options.priority;
+    });
+    const count = cluster.getChildCount();
+    const size = Math.min(60, 32 + Math.sqrt(count) * 5);
+    const colorClass = (maxPriority === "High" || maxPriority === "Critical") ? "cluster-high" : maxPriority === "Medium" ? "cluster-med" : "cluster-low";
+    
+    return L.divIcon({
+      html: `<div class="cluster-icon ${colorClass}" style="width:${size}px;height:${size}px;">${count}</div>`,
+      className: "", 
+      iconSize: L.point(size, size)
+    });
+  }
+
+  function initMap() {
+    map = L.map("map", { 
+      zoomControl: true, 
+      attributionControl: false 
+    }).setView([18.52, 73.84], 12);
+
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19
+    }).addTo(map);
+
+    clusterGroup = L.markerClusterGroup({
+      iconCreateFunction: createClusterIcon,
+      showCoverageOnHover: false,
+      maxClusterRadius: 70,
+      spiderfyOnMaxZoom: true,
+      disableClusteringAtZoom: 17
+    });
+
+    map.addLayer(clusterGroup);
+    
+    document.getElementById("map").addEventListener("click", (e) => {
+      const btn = e.target.closest(".pirm-upvote-btn");
+      if (btn) {
+        const id = btn.getAttribute("data-vote-id");
+        toggleUpvote(id);
+      }
+    });
+  }
+
+  function renderPopupHtml(reportId) {
+    const r = reports.find(x => x.id === reportId);
+    const voted = votedIds.has(reportId);
+    return `
+      <div style="font-weight:700; font-size:14px; margin-bottom:4px; color:#fff;">${r.title}</div>
+      <div style="font-size:12px; color:#94a3b8;"><i class="bi bi-geo-alt me-1 text-danger"></i>${r.location}</div>
+      <div style="font-size:12px; margin-top:6px;">
+        Severity: <span class="badge badge-pirm pirm-severity-${r.severity}">${r.severity}</span>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-secondary border-opacity-25">
+        <button class="btn btn-sm pirm-upvote-btn ${voted ? 'voted' : ''}" data-vote-id="${r.id}">
+          <i class="bi bi-hand-thumbs-up-fill me-1"></i>${r.upvotes}
+        </button>
+        <button class="btn btn-sm text-dark fw-bold" style="font-size:11px; background-color: var(--safety-orange); border-radius: 12px; color: #fff !important;" onclick="window.openPirmDetail('${r.id}')">Details</button>
+      </div>
+    `;
+  }
+
+  window.openPirmDetail = function(id) {
+    openDetailModal(id);
+  };
+
+  function updateMapMarkers(filteredReports) {
+    if (!clusterGroup) return;
+    clusterGroup.clearLayers();
+
+    filteredReports.forEach(r => {
+      if (r.lat && r.lng) {
+        const marker = L.marker([r.lat, r.lng], {
+          priority: r.severity,
+          icon: L.divIcon({
+            html: `<div class="report-dot" style="background:${priorityColor[r.severity]}"></div>`,
+            className: "", iconSize: [16, 16]
+          })
+        });
+
+        marker.bindPopup(() => renderPopupHtml(r.id));
+        markerById[r.id] = marker;
+        clusterGroup.addLayer(marker);
+      }
+    });
+  }
+
+  function toggleUpvote(id) {
+    const report = reports.find(r => r.id === id);
+    if (!report) return;
+
+    if (votedIds.has(id)) { 
+      votedIds.delete(id); 
+      report.upvotes -= 1; 
+    } else { 
+      votedIds.add(id); 
+      report.upvotes += 1; 
+    }
+
+    render();
+
+    const marker = markerById[id];
+    if (marker && marker.isPopupOpen()) {
+      marker.setPopupContent(renderPopupHtml(id));
+    }
+  }
+
   function cardHTML(r) {
     return `
       <div class="col-md-6 col-lg-4">
         <div class="card pirm-report-card h-100" data-detail-id="${r.id}">
-          <div class="pirm-report-photo" style="${r.photo ? `background-image:url('${r.photo}')` : 'background:#495057'}">
-            ${r.photo ? '' : '<i class="bi bi-cone-striped"></i>'}
+          <div class="pirm-report-photo-wrapper">
+            ${r.photo 
+              ? `<img src="${r.photo}" class="pirm-report-photo" alt="Pothole photo" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'pirm-photo-placeholder\\'><i class=\\'bi bi-cone-striped\\'></i><span>Photo Unavailable</span></div>';">` 
+              : `<div class="pirm-photo-placeholder"><i class="bi bi-cone-striped"></i><span>No Photo Provided</span></div>`
+            }
           </div>
-          <div class="card-body">
-            <div class="d-flex flex-wrap gap-1 mb-2">
-              <span class="badge pirm-severity-${r.severity}">${r.severity}</span>
-              <span class="badge pirm-status-${r.status}">${r.status}</span>
-              <span class="badge bg-light text-dark border">${r.roadType}</span>
+          <div class="card-body d-flex flex-column p-4">
+            <div class="d-flex flex-wrap gap-1 mb-3">
+              <span class="badge badge-pirm pirm-severity-${r.severity}">${r.severity}</span>
+              <span class="badge badge-pirm pirm-status-${r.status}">${r.status}</span>
+              <span class="badge bg-slate text-secondary border ms-auto align-self-center" style="font-size:10px; font-weight:600;">${r.roadType}</span>
             </div>
-            <h6 class="fw-bold mb-1">${r.title}</h6>
-            <p class="small text-muted mb-2">${r.description || 'No additional details provided.'}</p>
-            <p class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>${r.location} &nbsp;·&nbsp; <i class="bi bi-clock me-1"></i>${r.date}</p>
+            <h6 class="fw-bold mb-2 text-dark" style="font-size: 1.05rem;">${r.title}</h6>
+            <p class="small text-muted mb-3 flex-grow-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height: 1.5;">
+              ${r.description || 'No description provided.'}
+            </p>
+            <p class="small text-secondary fw-medium mb-3"><i class="bi bi-geo-alt-fill me-1" style="color: var(--safety-orange);"></i>${r.location}</p>
+            
             <div class="pirm-progress-wrap mb-3">
               <div class="progress"><div class="progress-bar ${progressBarClass(r.status)}" style="width:${progressPercent(r.status)}%"></div></div>
-              <div class="pirm-progress-labels"><span>Reported</span><span>Ack'd</span><span>Fixed</span></div>
+              <div class="pirm-progress-labels"><span>Reported</span><span>Acknowledged</span><span>Fixed</span></div>
             </div>
-            <div class="d-flex justify-content-between align-items-center">
-              <button class="btn btn-outline-secondary btn-sm pirm-upvote-btn ${votedIds.has(r.id) ? 'voted' : ''}" data-vote-id="${r.id}">
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+              <button class="btn pirm-upvote-btn ${votedIds.has(r.id) ? 'voted' : ''}" data-vote-id="${r.id}">
                 <i class="bi bi-hand-thumbs-up-fill me-1"></i>${r.upvotes}
               </button>
-              <small class="text-muted">#${r.id}</small>
+              <small class="text-muted fw-bold" style="font-size: 11px;">#${r.id}</small>
             </div>
           </div>
         </div>
@@ -245,32 +609,32 @@
       return true;
     });
 
-    document.getElementById('pirm-result-count').textContent = `${filtered.length}/${reports.length}`;
+    const countEl = document.getElementById('pirm-result-count');
+    if (countEl) countEl.textContent = `${filtered.length}/${reports.length}`;
 
     const grid = document.getElementById('pirm-report-grid');
-    grid.innerHTML = filtered.length === 0
-      ? `<div class="col-12 pirm-empty-state"><i class="bi bi-inboxes fs-1 d-block mb-2"></i>No reports match your filters.</div>`
-      : filtered.map(cardHTML).join('');
+    if (grid) {
+      grid.innerHTML = filtered.length === 0
+        ? `<div class="col-12 text-center py-5 text-muted"><i class="bi bi-inboxes fs-1 d-block mb-2"></i>No reports match your filters.</div>`
+        : filtered.map(cardHTML).join('');
 
-    // Attach Upvote Handlers
-    grid.querySelectorAll('.pirm-upvote-btn').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        const id = btn.getAttribute('data-vote-id');
-        const report = reports.find(r => r.id === id);
-        if (votedIds.has(id)) { votedIds.delete(id); report.upvotes -= 1; }
-        else { votedIds.add(id); report.upvotes += 1; }
-        render();
+      grid.querySelectorAll('.pirm-upvote-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const id = btn.getAttribute('data-vote-id');
+          toggleUpvote(id);
+        });
       });
-    });
 
-    // Attach Detail Modal Handlers
-    grid.querySelectorAll('[data-detail-id]').forEach(card => {
-      card.addEventListener('click', () => {
-        const id = card.getAttribute('data-detail-id');
-        openDetailModal(id);
+      grid.querySelectorAll('[data-detail-id]').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = card.getAttribute('data-detail-id');
+          openDetailModal(id);
+        });
       });
-    });
+    }
+
+    updateMapMarkers(filtered);
   }
 
   function openDetailModal(id) {
@@ -279,23 +643,23 @@
 
     const modalBody = document.getElementById('pirm-detail-body');
     modalBody.innerHTML = `
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold">${r.title}</h5>
+      <div class="modal-header border-0 pb-0 p-4">
+        <h5 class="modal-title fw-bold text-dark">${r.title}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        ${r.photo ? `<img src="${r.photo}" class="img-fluid rounded mb-3" alt="Report image">` : ''}
-        <p class="text-muted small">${r.description || 'No additional description provided.'}</p>
-        <div class="row g-2">
-          <div class="col-6"><small class="text-muted d-block">Report ID</small><strong>${r.id}</strong></div>
-          <div class="col-6"><small class="text-muted d-block">Severity</small><span class="badge pirm-severity-${r.severity}">${r.severity}</span></div>
-          <div class="col-6"><small class="text-muted d-block">Road Type</small><strong>${r.roadType}</strong></div>
-          <div class="col-6"><small class="text-muted d-block">Status</small><span class="badge pirm-status-${r.status}">${r.status}</span></div>
-          <div class="col-12 mt-2"><small class="text-muted d-block">Location</small><strong><i class="bi bi-geo-alt me-1"></i>${r.location}</strong></div>
+      <div class="modal-body p-4 pt-2">
+        ${r.photo ? `<img src="${r.photo}" class="img-fluid rounded-4 mb-3 w-100 shadow-sm" style="max-height:260px; object-fit:cover;" alt="Report image" onerror="this.style.display='none'">` : ''}
+        <p class="text-secondary small mb-3" style="line-height:1.6;">${r.description || 'No additional description provided.'}</p>
+        <div class="row g-3 bg-light p-3 rounded-4 border">
+          <div class="col-6"><small class="text-muted d-block">Report ID</small><strong class="text-dark">${r.id}</strong></div>
+          <div class="col-6"><small class="text-muted d-block">Severity</small><span class="badge badge-pirm pirm-severity-${r.severity}">${r.severity}</span></div>
+          <div class="col-6"><small class="text-muted d-block">Road Type</small><strong class="text-dark">${r.roadType}</strong></div>
+          <div class="col-6"><small class="text-muted d-block">Status</small><span class="badge badge-pirm pirm-status-${r.status}">${r.status}</span></div>
+          <div class="col-12"><small class="text-muted d-block">Location</small><strong class="text-dark"><i class="bi bi-geo-alt me-1 text-danger"></i>${r.location}</strong></div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+      <div class="modal-footer border-0 p-4 pt-0">
+        <button type="button" class="btn btn-secondary btn-sm px-4 rounded-pill fw-semibold" data-bs-dismiss="modal">Close</button>
       </div>
     `;
 
@@ -303,59 +667,12 @@
     detailModal.show();
   }
 
-  // Filter Listeners
-  document.getElementById('pirm-search').addEventListener('input', e => { filters.search = e.target.value; render(); });
-  document.getElementById('pirm-filter-status').addEventListener('change', e => { filters.status = e.target.value; render(); });
-  document.getElementById('pirm-filter-severity').addEventListener('change', e => { filters.severity = e.target.value; render(); });
+  // Event Listeners
+  document.getElementById('pirm-search')?.addEventListener('input', e => { filters.search = e.target.value; render(); });
+  document.getElementById('pirm-filter-status')?.addEventListener('change', e => { filters.status = e.target.value; render(); });
+  document.getElementById('pirm-filter-severity')?.addEventListener('change', e => { filters.severity = e.target.value; render(); });
 
-  // Photo Attachment Listener
-  document.getElementById('pirm-in-photo').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      pendingPhoto = ev.target.result;
-      const preview = document.getElementById('pirm-upload-preview');
-      preview.src = pendingPhoto;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // Location Detector
-  document.getElementById('pirm-geo-btn').addEventListener('click', () => {
-    const statusEl = document.getElementById('pirm-geo-status');
-    if (!navigator.geolocation) { statusEl.textContent = 'Geolocation not supported'; return; }
-    statusEl.textContent = 'Detecting location...';
-    navigator.geolocation.getCurrentPosition(
-      pos => { pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; statusEl.textContent = `📍 ${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}`; },
-      () => { statusEl.textContent = 'Location access denied'; },
-      { enableHighAccuracy: true, timeout: 8000 }
-    );
-  });
-
-  // Submit Incident Handler
-  document.getElementById('pirm-report-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const title = document.getElementById('pirm-in-title').value.trim();
-    if (!title) return;
-    const severity = document.getElementById('pirm-in-severity').value;
-    const roadType = document.getElementById('pirm-in-roadtype').value;
-    const description = document.getElementById('pirm-in-desc').value.trim();
-    const locationText = pendingCoords ? `${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}` : 'Location not attached';
-
-    reports.unshift({
-      id: `PIRM-${nextIdNum++}`, title, description, severity, roadType,
-      status: 'Reported', location: locationText, upvotes: 0, date: 'Just now', photo: pendingPhoto
-    });
-
-    e.target.reset();
-    document.getElementById('pirm-upload-preview').style.display = 'none';
-    document.getElementById('pirm-geo-status').textContent = 'No location attached yet';
-    pendingPhoto = null; pendingCoords = null;
-    render();
-  });
-
+  initMap();
   render();
 })();
 </script>

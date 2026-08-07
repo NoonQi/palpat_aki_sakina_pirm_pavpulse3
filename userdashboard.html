@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -70,7 +70,7 @@
       </span>
       <span id="pirm-user-badge" class="badge bg-secondary px-3 py-2 text-white"></span>
       <button id="pirm-logout-btn" class="btn btn-outline-light btn-sm auth-nav-btn">
-        <i class="bi bi-box-arrow-right me-1"></i>Log Out
+        <i class="bi bi-box-arrow-right me-1"></i><a href="index.html">Log Out</a>
       </button>
     </div>
   </div>
@@ -165,7 +165,7 @@
   <div class="row g-4" id="pirm-report-grid"></div>
 </div>
 
-<!-- Login Requirement Modal (Shown when unauthenticated) -->
+<!-- Login Requirement Modal (Shown when unauthenticated)
 <div class="modal fade" id="pirmAuthPromptModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -192,7 +192,7 @@
     </div>
   </div>
 </div>
-
+-->
 <!-- Detailed Incident Review Modal -->
 <div class="modal fade" id="pirmDetailModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -206,8 +206,8 @@
 
 <script>
 (function() {
-  const ADMIN_USER = 'admin';
-  const ADMIN_PASS = 'admin123';
+  const ADMIN_USER = 'admin@pirm.com';
+  const ADMIN_PASS = 'admin@PIRM';
 
   // 1. Session Check Function
   function checkSession() {
@@ -426,4 +426,4 @@
 })();
 </script>
 </body>
-</html>
+</html>-->

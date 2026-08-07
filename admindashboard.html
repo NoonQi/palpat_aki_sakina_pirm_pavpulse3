@@ -27,7 +27,7 @@
   .pirm-login-wrap input { width: 100%; font-family: inherit; font-size: 13px; padding: 10px 12px; margin-bottom: 10px; border: none; border-radius: 6px; background: #fff; color: var(--asphalt); }
   .pirm-login-btn { width: 100%; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--safety-orange); color: #fff; border: none; padding: 11px; border-radius: 6px; cursor: pointer; margin-top: 4px; }
   .pirm-login-error { color: #ff8787; font-size: 12px; margin-top: 10px; min-height: 14px; }
-  .pirm-login-hint { font-size: 11px; color: #7c7f87; margin-top: 16px; border-top: 1px solid #3a3d44; padding-top: 14px; }
+ /* .pirm-login-hint { font-size: 11px; color: #7c7f87; margin-top: 16px; border-top: 1px solid #3a3d44; padding-top: 14px; }*/
 
   .pirm-header { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 4px solid var(--asphalt); padding-bottom: 14px; margin-bottom: 22px; flex-wrap: wrap; gap: 10px; }
   .pirm-header-left { display: flex; align-items: center; gap: 12px; }
@@ -45,11 +45,10 @@
   .pirm-stat::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--stat-color, var(--safety-orange)); }
   .pirm-stat-num { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 600; line-height: 1; }
   .pirm-stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #b8bac0; margin-top: 4px; }
-
-  .pirm-analytics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
+/*.pirm-analytics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
   .pirm-chart-card { background: #fff; border: 2px solid var(--asphalt); border-radius: 8px; padding: 14px; }
   .pirm-chart-title { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--asphalt-soft); margin-bottom: 8px; }
-  .pirm-chart-card canvas { max-height: 160px; }
+  .pirm-chart-card canvas { max-height: 160px; }*/
 
   .pirm-controls { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
   .pirm-controls input, .pirm-controls select { font-family: inherit; font-size: 13px; padding: 8px 12px; border: 2px solid var(--asphalt); border-radius: 6px; background: #fff; color: var(--asphalt); }
@@ -124,8 +123,8 @@
   const STATUSES = ['Reported', 'Acknowledged', 'Fixed'];
   const SEVERITIES = ['Low', 'Medium', 'High', 'Critical'];
   const SEVERITY_COLOR = { Low: 'var(--sev-low)', Medium: 'var(--sev-medium)', High: 'var(--sev-high)', Critical: 'var(--sev-critical)' };
-  const ADMIN_USER = 'admin';
-  const ADMIN_PASS = 'admin123';
+  const ADMIN_USER = 'admin@pirm.com';
+  const ADMIN_PASS = 'admin@PIRM';
 
   let isLoggedIn = false;
   let loginError = '';
@@ -175,7 +174,6 @@
         <input id="pirm-login-pass" type="password" placeholder="Password">
         <button id="pirm-login-submit" class="pirm-login-btn">Log In</button>
         <div class="pirm-login-error">${loginError}</div>
-        <div class="pirm-login-hint">Demo credentials — Username: <b>admin</b> &nbsp;Password: <b>admin123</b></div>
       </div>
     `;
     const tryLogin = () => {
@@ -282,12 +280,6 @@
         <div class="pirm-stat" style="--stat-color: var(--rejected-red)"><div class="pirm-stat-num">${counts.Rejected}</div><div class="pirm-stat-label">Rejected</div></div>
         <div class="pirm-stat" style="--stat-color: var(--safety-orange)"><div class="pirm-stat-num">${totalUpvotes}</div><div class="pirm-stat-label">Upvotes</div></div>
         <div class="pirm-stat" style="--stat-color: #868e96"><div class="pirm-stat-num">${activeCount ? Math.round((counts.Fixed / activeCount) * 100) : 0}%</div><div class="pirm-stat-label">Resolved</div></div>
-      </div>
-
-      <div class="pirm-analytics">
-        <div class="pirm-chart-card"><div class="pirm-chart-title">By Severity</div><canvas id="pirm-chart-severity"></canvas></div>
-        <div class="pirm-chart-card"><div class="pirm-chart-title">By Status</div><canvas id="pirm-chart-status"></canvas></div>
-        <div class="pirm-chart-card"><div class="pirm-chart-title">Reports Trend (mock, 7d)</div><canvas id="pirm-chart-trend"></canvas></div>
       </div>
 
       <div class="pirm-controls">
