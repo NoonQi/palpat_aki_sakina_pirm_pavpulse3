@@ -224,6 +224,12 @@
       return null;
     }
 
+    // If user is a citizen (not admin), redirect to user dashboard
+    if (session.role !== 'admin') {
+      window.location.href = 'userdashboard.html';
+      return false;
+    }
+
     document.getElementById('pirm-user-badge').textContent = `Logged in: ${session.username}`;
     return session;
   }
