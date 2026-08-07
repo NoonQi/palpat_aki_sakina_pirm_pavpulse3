@@ -61,6 +61,9 @@
 </div>
 
 <script>
+  const ADMIN_USER = 'admin@pirm.com';
+  const ADMIN_PASS = 'admin@PIRM';
+
   // Show a success banner if arriving fresh from registration
   const params = new URLSearchParams(window.location.search);
   if (params.get('registered') === '1') {
@@ -81,11 +84,23 @@
       return;
     }
 
-    // Demo only — no backend/database exists yet to actually verify credentials,
-    // so any well-formed email + password combination is accepted for now.
-    // Once the backend is ready, this becomes a real authentication call.
+    // 1. ADMIN LOGIN ROUTE
+    if (email === ADMIN_USER && pass === ADMIN_PASS) {
+      localStorage.setItem('pirm_user', JSON.stringify({ 
+        username: 'admin', 
+        role: 'admin' 
+      }));
+      window.location.href = 'admindashboard.html';
+      return;
+    }
+
+    // 2. CITIZEN LOGIN ROUTE
     const displayName = params.get('name') || email.split('@')[0];
-    window.location.href = `userdashboard.html?name=${encodeURIComponent(displayName)}`;
+    localStorage.setItem('pirm_user', JSON.stringify({ 
+      username: displayName, 
+      role: 'citizen' 
+    }));
+    window.location.href = 'userdashboard.html';
   });
 </script>
 </body>
