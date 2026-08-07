@@ -19,14 +19,14 @@
   }
   #pirm-admin-root * { box-sizing: border-box; }
   .pirm-display { font-family: 'Oswald', 'Arial Narrow', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; }
-
+/*
   .pirm-login-wrap { max-width: 380px; margin: 40px auto; background: var(--asphalt); color: var(--paper); border-radius: 10px; padding: 32px 28px; text-align: center; }
   .pirm-login-badge { width: 52px; height: 52px; border-radius: 8px; background: var(--safety-orange); display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px; }
   .pirm-login-wrap h2 { margin: 0 0 4px; font-size: 20px; }
   .pirm-login-wrap p { font-size: 12.5px; color: #b8bac0; margin: 0 0 20px; }
   .pirm-login-wrap input { width: 100%; font-family: inherit; font-size: 13px; padding: 10px 12px; margin-bottom: 10px; border: none; border-radius: 6px; background: #fff; color: var(--asphalt); }
   .pirm-login-btn { width: 100%; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--safety-orange); color: #fff; border: none; padding: 11px; border-radius: 6px; cursor: pointer; margin-top: 4px; }
-  .pirm-login-error { color: #ff8787; font-size: 12px; margin-top: 10px; min-height: 14px; }
+  .pirm-login-error { color: #ff8787; font-size: 12px; margin-top: 10px; min-height: 14px; }*/
  /* .pirm-login-hint { font-size: 11px; color: #7c7f87; margin-top: 16px; border-top: 1px solid #3a3d44; padding-top: 14px; }*/
 
   .pirm-header { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 4px solid var(--asphalt); padding-bottom: 14px; margin-bottom: 22px; flex-wrap: wrap; gap: 10px; }
@@ -123,9 +123,10 @@
   const STATUSES = ['Reported', 'Acknowledged', 'Fixed'];
   const SEVERITIES = ['Low', 'Medium', 'High', 'Critical'];
   const SEVERITY_COLOR = { Low: 'var(--sev-low)', Medium: 'var(--sev-medium)', High: 'var(--sev-high)', Critical: 'var(--sev-critical)' };
+  /*
   const ADMIN_USER = 'admin@pirm.com';
   const ADMIN_PASS = 'admin@PIRM';
-
+*/
   let isLoggedIn = false;
   let loginError = '';
 
@@ -164,7 +165,7 @@
     return counts;
   }
 
-  function renderLogin() {
+  /*function renderLogin() {
     root.innerHTML = `
       <div class="pirm-login-wrap">
         <div class="pirm-login-badge">🕳️</div>
@@ -185,7 +186,7 @@
     document.getElementById('pirm-login-submit').addEventListener('click', tryLogin);
     document.getElementById('pirm-login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
   }
-
+*/
   function buildCharts() {
     if (typeof Chart === 'undefined') return;
     Object.values(charts).forEach(c => c && c.destroy());
@@ -245,7 +246,7 @@
   }
 
   function render() {
-    if (!isLoggedIn) { renderLogin(); return; }
+   // if (!isLoggedIn) { renderLogin(); return; }
 
     const counts = statCounts();
     const totalUpvotes = reports.reduce((sum, r) => sum + r.upvotes, 0);
