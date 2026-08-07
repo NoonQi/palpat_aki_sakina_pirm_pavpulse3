@@ -40,19 +40,6 @@
   @keyframes pirm-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
   .pirm-logout-btn { font-family: inherit; font-size: 11.5px; font-weight: 700; background: none; border: 2px solid var(--asphalt); color: var(--asphalt); padding: 5px 12px; border-radius: 20px; cursor: pointer; }
 
-  .pirm-form-section { background: var(--asphalt); color: var(--paper); border-radius: 8px; padding: 18px 18px 20px; margin-bottom: 26px; }
-  .pirm-form-heading { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
-  .pirm-form-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-  .pirm-form-grid input[type="text"], .pirm-form-grid select { width: 100%; font-family: inherit; font-size: 13px; padding: 9px 11px; border: none; border-radius: 6px; background: #fff; color: var(--asphalt); }
-  .pirm-form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-  .pirm-upload-box, .pirm-geo-box { border: 2px dashed #565962; border-radius: 6px; padding: 10px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.04); }
-  .pirm-upload-box input[type="file"] { font-size: 11px; color: var(--paper); flex: 1; }
-  .pirm-preview-thumb { width: 40px; height: 40px; border-radius: 5px; object-fit: cover; flex-shrink: 0; display: none; }
-  .pirm-geo-btn { font-family: inherit; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; background: var(--safety-orange); color: #fff; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-  .pirm-geo-status { font-size: 11.5px; color: #c9cbd1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pirm-submit-btn { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--fixed-green); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
-  .pirm-form-note { font-size: 11px; color: #9a9ca3; margin-top: 8px; }
-
   .pirm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-bottom: 22px; }
   .pirm-stat { background: var(--asphalt); color: var(--paper); border-radius: 8px; padding: 14px 16px; position: relative; overflow: hidden; }
   .pirm-stat::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--stat-color, var(--safety-orange)); }
@@ -121,7 +108,7 @@
 
   @media (max-width: 700px) { .pirm-analytics { grid-template-columns: 1fr; } }
   @media (max-width: 560px) {
-    .pirm-form-grid, .pirm-form-row2, .pirm-modal-meta-grid { grid-template-columns: 1fr; }
+    .pirm-modal-meta-grid { grid-template-columns: 1fr; }
     .pirm-card { grid-template-columns: 60px 1fr; }
     .pirm-card::before { left: 76px; }
     .pirm-photo { width: 60px; height: 54px; font-size: 18px; }
@@ -137,7 +124,6 @@
   const STATUSES = ['Reported', 'Acknowledged', 'Fixed'];
   const SEVERITIES = ['Low', 'Medium', 'High', 'Critical'];
   const SEVERITY_COLOR = { Low: 'var(--sev-low)', Medium: 'var(--sev-medium)', High: 'var(--sev-high)', Critical: 'var(--sev-critical)' };
-  const ROAD_TYPES = ['Highway', 'Main Road', 'Residential Street', 'Service Lane'];
   const ADMIN_USER = 'admin';
   const ADMIN_PASS = 'admin123';
 
@@ -155,9 +141,6 @@
 
   let filters = { status: 'All', severity: 'All', search: '' };
   let votedIds = new Set();
-  let nextIdNum = 114;
-  let pendingPhoto = null;
-  let pendingCoords = null;
   let activeModalId = null;
   let charts = {};
 
@@ -212,11 +195,9 @@
     const sevCounts = SEVERITIES.map(s => reports.filter(r => r.severity === s && !r.rejected).length);
     charts.severity = new Chart(document.getElementById('pirm-chart-severity'), {
       type: 'bar',
-      data: { labels: SEVERITIES, datasets: [{ data: sevCounts, backgroundColor: SEVERITIES.map(s => getComputedStyle(document.documentElement).getPropertyValue ? '' : ''), borderRadius: 4 }] },
+      data: { labels: SEVERITIES, datasets: [{ data: sevCounts, backgroundColor: ['#868e96', '#f5b700', '#f08c00', '#e03131'], borderRadius: 4 }] },
       options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, maintainAspectRatio: false }
     });
-    charts.severity.data.datasets[0].backgroundColor = ['#868e96', '#f5b700', '#f08c00', '#e03131'];
-    charts.severity.update();
 
     const counts = statCounts();
     charts.status = new Chart(document.getElementById('pirm-chart-status'), {
@@ -292,27 +273,6 @@
           <div class="pirm-live-tag"><span class="pirm-live-dot"></span>${activeCount} active</div>
           <button class="pirm-logout-btn" id="pirm-logout">Log Out</button>
         </div>
-      </div>
-
-      <div class="pirm-form-section">
-        <p class="pirm-form-heading pirm-display">🕳️ Report a New Pothole</p>
-        <div class="pirm-form-grid">
-          <input id="pirm-new-title" type="text" placeholder="Brief title, e.g. Pothole near bus stop">
-          <select id="pirm-new-severity">${SEVERITIES.map(s => `<option>${s}</option>`).join('')}</select>
-          <select id="pirm-new-roadtype">${ROAD_TYPES.map(r => `<option>${r}</option>`).join('')}</select>
-        </div>
-        <div class="pirm-form-row2">
-          <div class="pirm-upload-box">
-            <input id="pirm-new-photo" type="file" accept="image/*" capture="environment">
-            <img id="pirm-preview-thumb" class="pirm-preview-thumb" alt="preview">
-          </div>
-          <div class="pirm-geo-box">
-            <button id="pirm-geo-btn" class="pirm-geo-btn" type="button">📍 Use My Location</button>
-            <span id="pirm-geo-status" class="pirm-geo-status">No location attached yet</span>
-          </div>
-        </div>
-        <button id="pirm-submit-btn" class="pirm-submit-btn">Submit Report</button>
-        <p class="pirm-form-note">Photo and location are optional in this demo, but recommended for real reports.</p>
       </div>
 
       <div class="pirm-stats">
@@ -394,41 +354,6 @@
       });
     });
 
-    document.getElementById('pirm-new-photo').addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        pendingPhoto = ev.target.result;
-        const thumb = document.getElementById('pirm-preview-thumb');
-        thumb.src = pendingPhoto;
-        thumb.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    });
-
-    document.getElementById('pirm-geo-btn').addEventListener('click', () => {
-      const statusEl = document.getElementById('pirm-geo-status');
-      if (!navigator.geolocation) { statusEl.textContent = 'Geolocation not supported'; return; }
-      statusEl.textContent = 'Detecting location...';
-      navigator.geolocation.getCurrentPosition(
-        pos => { pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }; statusEl.textContent = `📍 ${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}`; },
-        () => { statusEl.textContent = 'Location access denied or unavailable'; },
-        { enableHighAccuracy: true, timeout: 8000 }
-      );
-    });
-
-    document.getElementById('pirm-submit-btn').addEventListener('click', () => {
-      const title = document.getElementById('pirm-new-title').value.trim();
-      const severity = document.getElementById('pirm-new-severity').value;
-      const roadType = document.getElementById('pirm-new-roadtype').value;
-      if (!title) { document.getElementById('pirm-new-title').focus(); return; }
-      const locationText = pendingCoords ? `${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}` : 'Location not attached';
-      reports.unshift({ id: `PIRM-${nextIdNum++}`, title, description: '', severity, roadType, status: 'Reported', rejected: false, location: locationText, upvotes: 0, date: 'Just now', photo: pendingPhoto, notes: '' });
-      pendingPhoto = null; pendingCoords = null;
-      render();
-    });
-
     const overlay = document.getElementById('pirm-modal-overlay');
     if (overlay) {
       overlay.addEventListener('click', e => { if (e.target === overlay) { activeModalId = null; render(); } });
@@ -438,26 +363,36 @@
       const saveBtn = document.getElementById('pirm-modal-save');
       if (saveBtn) saveBtn.addEventListener('click', () => {
         const r = reports.find(x => x.id === activeModalId);
-        const statusSel = document.getElementById('pirm-modal-status');
-        if (statusSel) r.status = statusSel.value;
-        r.notes = document.getElementById('pirm-modal-notes').value;
+        if (r) {
+          const statusSelect = document.getElementById('pirm-modal-status');
+          if (statusSelect) r.status = statusSelect.value;
+          r.notes = document.getElementById('pirm-modal-notes').value;
+        }
         activeModalId = null;
         render();
       });
 
       const rejectBtn = document.getElementById('pirm-modal-reject');
-      if (rejectBtn) rejectBtn.addEventListener('click', () => { reports.find(x => x.id === activeModalId).rejected = true; activeModalId = null; render(); });
+      if (rejectBtn) rejectBtn.addEventListener('click', () => {
+        const r = reports.find(x => x.id === activeModalId);
+        if (r) r.rejected = true;
+        activeModalId = null;
+        render();
+      });
 
       const unrejectBtn = document.getElementById('pirm-modal-unreject');
-      if (unrejectBtn) unrejectBtn.addEventListener('click', () => { reports.find(x => x.id === activeModalId).rejected = false; activeModalId = null; render(); });
+      if (unrejectBtn) unrejectBtn.addEventListener('click', () => {
+        const r = reports.find(x => x.id === activeModalId);
+        if (r) r.rejected = false;
+        activeModalId = null;
+        render();
+      });
 
       const deleteBtn = document.getElementById('pirm-modal-delete');
       if (deleteBtn) deleteBtn.addEventListener('click', () => {
-        if (confirm('Delete this report permanently? This cannot be undone.')) {
-          reports = reports.filter(x => x.id !== activeModalId);
-          activeModalId = null;
-          render();
-        }
+        reports = reports.filter(x => x.id !== activeModalId);
+        activeModalId = null;
+        render();
       });
     }
   }
