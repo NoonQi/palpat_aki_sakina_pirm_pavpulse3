@@ -265,7 +265,7 @@
     { id: 'PIRM-113', title: 'Medium pothole, edge crumbling further', description: 'The pothole edges are crumbling further with each rainfall, expanding its diameter.', severity: 'Medium', roadType: 'Residential Street', status: 'Reported', location: 'Aundh Society Road', upvotes: 14, date: '4 days ago', photo: null },
   ];
 
-  let filters = { status: 'All', severity: 'All', search: '' };
+  /*let filters = { status: 'All', severity: 'All', search: '' };
   let votedIds = new Set();
   let nextIdNum = 114;
   let pendingPhoto = null;
@@ -273,6 +273,31 @@
 
   function progressPercent(status) {
     return { Reported: 15, Acknowledged: 55, Fixed: 100 }[status];
+  }*/
+  let filters = { status: 'All', severity: 'All', search: '' };
+  let votedIds = new Set();
+  let activeModalId = null;
+  let charts = {};
+
+  const root = document.getElementById('pirm-admin-root');
+
+  function trackHTML(status) {
+    const idx = STATUSES.indexOf(status);
+    return `
+      <div class="pirm-track">
+        ${STATUSES.map((s, i) => `
+          ${i > 0 ? `<div class="pirm-track-seg ${i <= idx ? 'filled' : ''}"></div>` : ''}
+          <div class="pirm-track-dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>
+        `).join('')}
+      </div>
+      <div class="pirm-track-labels"><span>Reported</span><span>Ack'd</span><span>Fixed</span></div>
+    `;
+  }
+
+  function statCounts() {
+    const counts = { Reported: 0, Acknowledged: 0, Fixed: 0, Rejected: 0 };
+    reports.forEach(r => { if (r.rejected) counts.Rejected++; else counts[r.status]++; });
+    return counts;
   }
   function progressBarClass(status) {
     return { Reported: 'bg-warning', Acknowledged: 'bg-primary', Fixed: 'bg-success' }[status];
