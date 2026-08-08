@@ -206,6 +206,81 @@
 
 <script>
 (function() {
+  // Greeting from a login redirect, e.g. userlogin.html?name=Priya
+  const urlParams = new URLSearchParams(window.location.search);
+  const userName = urlParams.get('name');
+  if (userName) {
+    document.getElementById('pirm-greeting').textContent = `Welcome back, ${userName}`;
+    const badge = document.getElementById('pirm-user-badge');
+    badge.textContent = `Logged in: ${userName}`;
+    badge.style.display = 'inline-block';
+  }
+
+  let reports = [
+    { id: 'PIRM-101', title: 'Deep pothole blocking left lane', description: 'A large pothole roughly 2 feet wide has formed near the signal, forcing vehicles to swerve into oncoming traffic.', severity: 'Critical', roadType: 'Main Road', status: 'Reported', location: 'MG Road, near Deccan signal', upvotes: 42, date: '2 days ago', photo: "impotholes/pothole1.jpg" },
+    { id: 'PIRM-106', title: 'Cracked road surface, cyclists at risk', description: 'Long cracks running along the service lane are catching bicycle tires, causing near-falls.', severity: 'High', roadType: 'Service Lane', status: 'Acknowledged', location: 'Baner Road service lane', upvotes: 33, date: '5 days ago', photo: null },
+    { id: 'PIRM-110', title: 'Pothole cluster, 4 reports in same block', description: 'Multiple potholes reported within the same stretch, suggesting a resurfacing issue rather than isolated damage.', severity: 'Critical', roadType: 'Highway', status: 'Reported', location: 'Hadapsar bypass', upvotes: 49, date: '2 days ago', photo: null },
+    { id: 'PIRM-111', title: 'Small pothole near residential gate', description: 'A shallow but widening pothole near house entrances, growing after recent rain.', severity: 'Low', roadType: 'Residential Street', status: 'Fixed', location: 'Kothrud Society Lane 3', upvotes: 11, date: '8 days ago', photo: null },
+    { id: 'PIRM-112', title: 'Pothole causing traffic slowdown at peak hours', description: 'Vehicles are braking suddenly to avoid it, causing minor pile-ups during rush hour.', severity: 'High', roadType: 'Main Road', status: 'Acknowledged', location: 'FC Road, near college gate', upvotes: 38, date: '3 days ago', photo: null },
+    { id: 'PIRM-113', title: 'Medium pothole, edge crumbling further', description: 'The pothole edges are crumbling further with each rainfall, expanding its diameter.', severity: 'Medium', roadType: 'Residential Street', status: 'Reported', location: 'Aundh Society Road', upvotes: 14, date: '4 days ago', photo: null },
+  ];
+
+  let filters = { status: 'All', severity: 'All', search: '' };
+  let votedIds = new Set();
+  let mySubmittedIds = new Set();
+  let nextIdNum = 114;
+  let pendingPhoto = null;
+  let pendingCoords = null;
+
+  function progressPercent(status) {
+    return { Reported: 15, Acknowledged: 55, Fixed: 100 }[status];
+  }
+  function progressBarClass(status) {
+    return { Reported: 'bg-warning', Acknowledged: 'bg-primary', Fixed: 'bg-success' }[status];
+  }
+
+  function cardHTML(r) {
+    return `
+      <div class="col-md-6 col-lg-4">
+        <div class="card pirm-report-card h-100" data-detail-id="${r.id}">
+          <div class="pirm-report-photo" style="${r.photo ? `background-image:url('${r.photo}')` : 'background:#495057'}">
+            ${r.photo ? '' : '<i class="bi bi-cone-striped"></i>'}
+          </div>
+          <div class="card-body">
+            <div class="d-flex flex-wrap gap-1 mb-2">
+              <span class="badge pirm-severity-${r.severity}">${r.severity}</span>
+              <span class="badge pirm-status-${r.status}">${r.status}</span>
+              <span class="badge bg-light text-dark border">${r.roadType}</span>
+            </div>
+            <h6 class="fw-bold mb-1">${r.title}</h6>
+            <p class="small text-muted mb-2">${r.description || 'No additional details provided.'}</p>
+            <p class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>${r.location} &nbsp;·&nbsp; <i class="bi bi-clock me-1"></i>${r.date}</p>
+            <div class="pirm-progress-wrap mb-3">
+              <div class="progress"><div class="progress-bar ${progressBarClass(r.status)}" style="width:${progressPercent(r.status)}%"></div></div>
+              <div class="pirm-progress-labels"><span>Reported</span><span>Ack'd</span><span>Fixed</span></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-outline-secondary btn-sm pirm-upvote-btn ${votedIds.has(r.id) ? 'voted' : ''}" data-vote-id="${r.id}">
+                <i class="bi bi-hand-thumbs-up-fill me-1"></i>${r.upvotes}
+              </button>
+              <small class="text-muted">#${r.id}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function render() {
+    const filtered = reports.filter(r => {
+      if (filters.status !== 'All' && r.status !== filters.status) return false;
+      if (filters.severity !== 'All' && r.severity !== filters.severity) return false;
+      if (filters.search && !(r.title + r.location).toLowerCase().includes(filters.search.toLowerCase())) return false;
+      return true;
+    });
+
+<script>
+(function() {
   const ADMIN_USER = 'admin@pirm.com';
   const ADMIN_PASS = 'admin@PIRM';
 
