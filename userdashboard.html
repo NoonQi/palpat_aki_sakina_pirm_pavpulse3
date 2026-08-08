@@ -60,26 +60,29 @@
 <!-- Navigation Bar -->
 <nav class="navbar navbar-pirm navbar-dark py-3 mb-4">
   <div class="container d-flex justify-content-between align-items-center">
-    <a class="navbar-brand mb-0 h1 text-decoration-none" href="userdashboard.html">
+    <a class="navbar-brand mb-0 h1 text-decoration-none" href="index.html">
       <i class="bi bi-cone-striped me-2"></i>PIRM Citizen Portal
     </a>
-    
+
     <div class="d-flex align-items-center gap-2">
       <span class="badge bg-success rounded-pill px-3 py-2 d-none d-md-inline-block me-2">
         <i class="bi bi-broadcast-pin me-1"></i>Live tracking
       </span>
-      <span id="pirm-user-badge" class="badge bg-secondary px-3 py-2 text-white"></span>
-      <button id="pirm-logout-btn" class="btn btn-outline-light btn-sm auth-nav-btn">
-        <i class="bi bi-box-arrow-right me-1"></i><a href="index.html">Log Out</a>
-      </button>
+      <span id="pirm-user-badge" class="badge bg-secondary px-3 py-2 text-white" style="display:none;"></span>
+      <a href="index.html" class="btn btn-outline-light btn-sm auth-nav-btn">
+        <i class="bi bi-box-arrow-right me-1"></i>Log Out
+      </a>
     </div>
   </div>
 </nav>
 
 <div class="pirm-hero">
   <div class="container">
-    <h1 class="pirm-display">Report & Track Infrastructure Issues</h1>
+    <h1 class="pirm-display" id="pirm-greeting">Report & Track Infrastructure Issues</h1>
     <p>Snap a photo, tag the location, and let your neighbors upvote it so the city knows what to fix first.</p>
+    <div class="mt-2">
+      <span class="badge bg-light text-dark px-3 py-2"><i class="bi bi-file-earmark-check me-1"></i>Reports you've submitted: <b id="pirm-my-count">0</b></span>
+    </div>
   </div>
 </div>
 
@@ -112,22 +115,25 @@
             <textarea class="form-control" id="pirm-in-desc" rows="2" placeholder="Add any details that would help — size, how long it's been there, nearby landmark..."></textarea>
           </div>
           <div class="col-md-6">
-            <label class="form-label small fw-semibold">Photo</label>
+            <label class="form-label small fw-semibold">Photo <span class="text-danger">*</span></label>
             <div class="d-flex align-items-center gap-2">
-              <input type="file" class="form-control" id="pirm-in-photo" accept="image/*" capture="environment">
+              <input type="file" class="form-control" id="pirm-in-photo" accept="image/*" capture="environment" required>
               <img id="pirm-upload-preview" class="pirm-upload-preview" alt="preview">
             </div>
           </div>
           <div class="col-md-6">
-            <label class="form-label small fw-semibold">Location</label>
+            <label class="form-label small fw-semibold">Location <span class="text-danger">*</span></label>
             <div class="d-flex align-items-center gap-2">
               <button type="button" class="btn btn-pirm-geo" id="pirm-geo-btn"><i class="bi bi-geo-alt-fill me-1"></i>Use My Location</button>
               <small id="pirm-geo-status" class="text-muted text-truncate">No location attached yet</small>
             </div>
           </div>
+          <div class="col-12">
+            <div id="pirm-form-error" class="text-danger small" style="display:none;"></div>
+          </div>
           <div class="col-12 mt-2">
             <button type="submit" class="btn btn-pirm-primary text-white px-4"><i class="bi bi-send-fill me-1"></i>Submit Report</button>
-            <small class="text-muted ms-2">Photo and location are optional here, but help the city prioritize.</small>
+            <small class="text-muted ms-2">Photo and location help the city verify and prioritize your report.</small>
           </div>
         </div>
       </form>
@@ -165,34 +171,6 @@
   <div class="row g-4" id="pirm-report-grid"></div>
 </div>
 
-<!-- Login Requirement Modal (Shown when unauthenticated)
-<div class="modal fade" id="pirmAuthPromptModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-dark text-white">
-        <h5 class="modal-title fw-bold"><i class="bi bi-shield-lock me-2"></i>Authentication Required</h5>
-      </div>
-      <div class="modal-body p-4">
-        <p class="text-muted small mb-3">Please sign in to access the portal. Admin credentials will route automatically to the Admin Dashboard.</p>
-        <form id="pirm-prompt-login-form">
-          <div class="mb-3">
-            <label class="form-label small fw-semibold">Username</label>
-            <input type="text" class="form-control" id="prompt-username" required placeholder="Enter username">
-          </div>
-          <div class="mb-3">
-            <label class="form-label small fw-semibold">Password</label>
-            <input type="password" class="form-control" id="prompt-password" required placeholder="Enter password">
-          </div>
-          <button type="submit" class="btn btn-pirm-primary text-white w-100 fw-bold py-2 mb-2">Log In</button>
-        </form>
-        <div class="text-center mt-3">
-          <small class="text-muted">Don't have an account? <a href="userregister.html" class="fw-bold text-dark">Register here</a></small>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
--->
 <!-- Detailed Incident Review Modal -->
 <div class="modal fade" id="pirmDetailModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -217,7 +195,7 @@
   }
 
   let reports = [
-    { id: 'PIRM-101', title: 'Deep pothole blocking left lane', description: 'A large pothole roughly 2 feet wide has formed near the signal, forcing vehicles to swerve into oncoming traffic.', severity: 'Critical', roadType: 'Main Road', status: 'Reported', location: 'MG Road, near Deccan signal', upvotes: 42, date: '2 days ago', photo: "impotholes/pothole1.jpg" },
+    { id: 'PIRM-101', title: 'Deep pothole blocking left lane', description: 'A large pothole roughly 2 feet wide has formed near the signal, forcing vehicles to swerve into oncoming traffic.', severity: 'Critical', roadType: 'Main Road', status: 'Reported', location: 'MG Road, near Deccan signal', upvotes: 42, date: '2 days ago', photo: null },
     { id: 'PIRM-106', title: 'Cracked road surface, cyclists at risk', description: 'Long cracks running along the service lane are catching bicycle tires, causing near-falls.', severity: 'High', roadType: 'Service Lane', status: 'Acknowledged', location: 'Baner Road service lane', upvotes: 33, date: '5 days ago', photo: null },
     { id: 'PIRM-110', title: 'Pothole cluster, 4 reports in same block', description: 'Multiple potholes reported within the same stretch, suggesting a resurfacing issue rather than isolated damage.', severity: 'Critical', roadType: 'Highway', status: 'Reported', location: 'Hadapsar bypass', upvotes: 49, date: '2 days ago', photo: null },
     { id: 'PIRM-111', title: 'Small pothole near residential gate', description: 'A shallow but widening pothole near house entrances, growing after recent rain.', severity: 'Low', roadType: 'Residential Street', status: 'Fixed', location: 'Kothrud Society Lane 3', upvotes: 11, date: '8 days ago', photo: null },
@@ -279,146 +257,8 @@
       return true;
     });
 
-<script>
-(function() {
-  const ADMIN_USER = 'admin@pirm.com';
-  const ADMIN_PASS = 'admin@PIRM';
-
-  // 1. Session Check Function
-  function checkSession() {
-    const session = JSON.parse(localStorage.getItem('pirm_user'));
-    if (!session) {
-      const authModal = new bootstrap.Modal(document.getElementById('pirmAuthPromptModal'));
-      authModal.show();
-      return null;
-    }
-    
-    // Redirect if admin session is detected on user dashboard
-    if (session.role === 'admin') {
-      window.location.href = 'admindashboard.html';
-      return null;
-    }
-
-    // If user is a citizen (not admin), redirect to user dashboard
-    if (session.role !== 'admin') {
-      window.location.href = 'userdashboard.html';
-      return false;
-    }
-
-    document.getElementById('pirm-user-badge').textContent = `Logged in: ${session.username}`;
-    return session;
-  }
-
-  // Handle Prompt Login Submission
-  document.getElementById('pirm-prompt-login-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const u = document.getElementById('prompt-username').value.trim();
-    const p = document.getElementById('prompt-password').value;
-
-    if (u === ADMIN_USER && p === ADMIN_PASS) {
-      localStorage.setItem('pirm_user', JSON.stringify({ username: 'admin', role: 'admin' }));
-      window.location.href = 'admindashboard.html';
-    } else if (u && p) {
-      localStorage.setItem('pirm_user', JSON.stringify({ username: u, role: 'citizen' }));
-      window.location.reload();
-    }
-  });
-
-  // Handle Logout
-  document.getElementById('pirm-logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('pirm_user');
-    window.location.reload();
-  });
-
-  // Incident Reports Data
-  let reports = [
-    { id: 'PIRM-101', title: 'Deep pothole blocking left lane', description: 'A large pothole roughly 2 feet wide has formed near the signal, forcing vehicles to swerve into oncoming traffic.', severity: 'Critical', roadType: 'Main Road', status: 'Reported', location: 'MG Road, near Deccan signal', upvotes: 42, date: '2 days ago', photo: null },
-    { id: 'PIRM-106', title: 'Cracked road surface, cyclists at risk', description: 'Long cracks running along the service lane are catching bicycle tires, causing near-falls.', severity: 'High', roadType: 'Service Lane', status: 'Acknowledged', location: 'Baner Road service lane', upvotes: 33, date: '5 days ago', photo: null },
-    { id: 'PIRM-110', title: 'Pothole cluster, 4 reports in same block', description: 'Multiple potholes reported within the same stretch, suggesting a resurfacing issue rather than isolated damage.', severity: 'Critical', roadType: 'Highway', status: 'Reported', location: 'Hadapsar bypass', upvotes: 49, date: '2 days ago', photo: null },
-    { id: 'PIRM-111', title: 'Small pothole near residential gate', description: 'A shallow but widening pothole near house entrances, growing after recent rain.', severity: 'Low', roadType: 'Residential Street', status: 'Fixed', location: 'Kothrud Society Lane 3', upvotes: 11, date: '8 days ago', photo: null },
-    { id: 'PIRM-112', title: 'Pothole causing traffic slowdown at peak hours', description: 'Vehicles are braking suddenly to avoid it, causing minor pile-ups during rush hour.', severity: 'High', roadType: 'Main Road', status: 'Acknowledged', location: 'FC Road, near college gate', upvotes: 38, date: '3 days ago', photo: null },
-    { id: 'PIRM-113', title: 'Medium pothole, edge crumbling further', description: 'The pothole edges are crumbling further with each rainfall, expanding its diameter.', severity: 'Medium', roadType: 'Residential Street', status: 'Reported', location: 'Aundh Society Road', upvotes: 14, date: '4 days ago', photo: null },
-  ];
-
-  /*let filters = { status: 'All', severity: 'All', search: '' };
-  let votedIds = new Set();
-  let nextIdNum = 114;
-  let pendingPhoto = null;
-  let pendingCoords = null;
-
-  function progressPercent(status) {
-    return { Reported: 15, Acknowledged: 55, Fixed: 100 }[status];
-  }*/
-  let filters = { status: 'All', severity: 'All', search: '' };
-  let votedIds = new Set();
-  let activeModalId = null;
-  let charts = {};
-
-  const root = document.getElementById('pirm-admin-root');
-
-  function trackHTML(status) {
-    const idx = STATUSES.indexOf(status);
-    return `
-      <div class="pirm-track">
-        ${STATUSES.map((s, i) => `
-          ${i > 0 ? `<div class="pirm-track-seg ${i <= idx ? 'filled' : ''}"></div>` : ''}
-          <div class="pirm-track-dot ${i < idx ? 'done' : ''} ${i === idx ? 'active' : ''}"></div>
-        `).join('')}
-      </div>
-      <div class="pirm-track-labels"><span>Reported</span><span>Ack'd</span><span>Fixed</span></div>
-    `;
-  }
-
-  function statCounts() {
-    const counts = { Reported: 0, Acknowledged: 0, Fixed: 0, Rejected: 0 };
-    reports.forEach(r => { if (r.rejected) counts.Rejected++; else counts[r.status]++; });
-    return counts;
-  }
-  function progressBarClass(status) {
-    return { Reported: 'bg-warning', Acknowledged: 'bg-primary', Fixed: 'bg-success' }[status];
-  }
-
-  function cardHTML(r) {
-    return `
-      <div class="col-md-6 col-lg-4">
-        <div class="card pirm-report-card h-100" data-detail-id="${r.id}">
-          <div class="pirm-report-photo" style="${r.photo ? `background-image:url('${r.photo}')` : 'background:#495057'}">
-            ${r.photo ? '' : '<i class="bi bi-cone-striped"></i>'}
-          </div>
-          <div class="card-body">
-            <div class="d-flex flex-wrap gap-1 mb-2">
-              <span class="badge pirm-severity-${r.severity}">${r.severity}</span>
-              <span class="badge pirm-status-${r.status}">${r.status}</span>
-              <span class="badge bg-light text-dark border">${r.roadType}</span>
-            </div>
-            <h6 class="fw-bold mb-1">${r.title}</h6>
-            <p class="small text-muted mb-2">${r.description || 'No additional details provided.'}</p>
-            <p class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>${r.location} &nbsp;·&nbsp; <i class="bi bi-clock me-1"></i>${r.date}</p>
-            <div class="pirm-progress-wrap mb-3">
-              <div class="progress"><div class="progress-bar ${progressBarClass(r.status)}" style="width:${progressPercent(r.status)}%"></div></div>
-              <div class="pirm-progress-labels"><span>Reported</span><span>Ack'd</span><span>Fixed</span></div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center">
-              <button class="btn btn-outline-secondary btn-sm pirm-upvote-btn ${votedIds.has(r.id) ? 'voted' : ''}" data-vote-id="${r.id}">
-                <i class="bi bi-hand-thumbs-up-fill me-1"></i>${r.upvotes}
-              </button>
-              <small class="text-muted">#${r.id}</small>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function render() {
-    const filtered = reports.filter(r => {
-      if (filters.status !== 'All' && r.status !== filters.status) return false;
-      if (filters.severity !== 'All' && r.severity !== filters.severity) return false;
-      if (filters.search && !(r.title + r.location).toLowerCase().includes(filters.search.toLowerCase())) return false;
-      return true;
-    });
-
     document.getElementById('pirm-result-count').textContent = `${filtered.length}/${reports.length}`;
+    document.getElementById('pirm-my-count').textContent = mySubmittedIds.size;
 
     const grid = document.getElementById('pirm-report-grid');
     grid.innerHTML = filtered.length === 0
@@ -474,11 +314,12 @@
     detailModal.show();
   }
 
-  // Event Listeners
+  // Filter/search listeners
   document.getElementById('pirm-search').addEventListener('input', e => { filters.search = e.target.value; render(); });
   document.getElementById('pirm-filter-status').addEventListener('change', e => { filters.status = e.target.value; render(); });
   document.getElementById('pirm-filter-severity').addEventListener('change', e => { filters.severity = e.target.value; render(); });
 
+  // Photo upload preview
   document.getElementById('pirm-in-photo').addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
@@ -492,6 +333,7 @@
     reader.readAsDataURL(file);
   });
 
+  // Geotag capture
   document.getElementById('pirm-geo-btn').addEventListener('click', () => {
     const statusEl = document.getElementById('pirm-geo-status');
     if (!navigator.geolocation) { statusEl.textContent = 'Geolocation not supported'; return; }
@@ -503,19 +345,41 @@
     );
   });
 
+  // Submit new report
   document.getElementById('pirm-report-form').addEventListener('submit', e => {
     e.preventDefault();
+    const errorEl = document.getElementById('pirm-form-error');
     const title = document.getElementById('pirm-in-title').value.trim();
-    if (!title) return;
     const severity = document.getElementById('pirm-in-severity').value;
     const roadType = document.getElementById('pirm-in-roadtype').value;
     const description = document.getElementById('pirm-in-desc').value.trim();
-    const locationText = pendingCoords ? `${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}` : 'Location not attached';
+
+    if (!title) {
+      errorEl.textContent = 'Please enter a title for the report.';
+      errorEl.style.display = 'block';
+      document.getElementById('pirm-in-title').focus();
+      return;
+    }
+    if (!pendingPhoto) {
+      errorEl.textContent = 'A photo is required — please upload one before submitting.';
+      errorEl.style.display = 'block';
+      return;
+    }
+    if (!pendingCoords) {
+      errorEl.textContent = 'Location is required — click "Use My Location" before submitting.';
+      errorEl.style.display = 'block';
+      return;
+    }
+    errorEl.style.display = 'none';
+
+    const locationText = `${pendingCoords.lat.toFixed(4)}, ${pendingCoords.lng.toFixed(4)}`;
+    const newId = `PIRM-${nextIdNum++}`;
 
     reports.unshift({
-      id: `PIRM-${nextIdNum++}`, title, description, severity, roadType,
+      id: newId, title, description, severity, roadType,
       status: 'Reported', location: locationText, upvotes: 0, date: 'Just now', photo: pendingPhoto
     });
+    mySubmittedIds.add(newId);
 
     e.target.reset();
     document.getElementById('pirm-upload-preview').style.display = 'none';
@@ -524,12 +388,8 @@
     render();
   });
 
-  // Initialization
-  const activeUser = checkSession();
-  if (activeUser) {
-    render();
-  }
+  render();
 })();
 </script>
 </body>
-</html>-->
+</html>
