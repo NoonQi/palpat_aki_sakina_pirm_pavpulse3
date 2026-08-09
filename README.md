@@ -21,22 +21,18 @@ https://pallu04patil-blip.github.io/palpat_aki_sakina_pirm_pavpulse3/
 ```
 pirm-project/
 ├── index.html                     Homepage — pipeline overview, entry points, public report browser
-├── user-login.html                Citizen sign in
-├── user-register.html             Citizen account creation
-├── user-dashboard-bootstrap.html  Citizen Portal — submit reports, browse, upvote
-├── admin-dashboard-potholes.html  Admin Console — review, update status, analytics
+├── userlogin.html                Citizen sign in
+├── userregister.html             Citizen account creation
+├── userdashboard.html  Citizen Portal — submit reports, browse, upvote
+├── admindashboard.html  Admin Console — review, update status, analytics
 ├── pothole2.html                  Hotspot Map with clustering (teammate's module)
-└── data.js                        Shared mock data — see note below
+└─backend data                        Shared data — (local storage througb MySQL)
 ```
-
-> **Note on `data.js`:** this file is intentionally not detailed here since it's a temporary stand-in. See [Backend Integration](#backend-integration-todo) for what replaces it.
-
----
 
 ## Modules
 
 ### 1. Homepage (`index.html`)
-The entry point and navigation hub. Shows the Reported → Acknowledged → Fixed pipeline visually, gives citizens two buttons (**Sign In** / **Register**), gives admins a separate **Admin Login** button, and links out to the Map module. Also includes a **public "Browse Recent Reports" section** with search, status filter, severity filter, and sort — visible without logging in. Upvoting from this view prompts sign-in, since votes are tied to an account.
+The entry point and navigation hub. Shows the Reported → Acknowledged → Fixed pipeline visually, gives citizens two buttons (**Sign In** / **Register**), gives admins a separate **Admin Login** button, as well as shows Map  Clustering module. Also includes a **public "Browse Recent Reports" section** with search, status filter, severity filter, and sort — visible without logging in. Upvoting from this view prompts sign-in, since votes are tied to an account.
 
 *Jira: part of SCRUM-32 scope*
 
@@ -51,23 +47,20 @@ Built with Bootstrap 5. Lets citizens:
 - Browse all reports with search, status filter, severity filter, and sort (Newest / Most Upvoted / Severity)
 - Upvote reports (toggleable, one vote per report per session)
 - See a personalized greeting and a live "Reports you've submitted this session" counter
-- Filter to "my reports only"
 
 *Jira: SCRUM-32*
 
-### 4. Admin Console (`admin-dashboard-potholes.html`)
-Gated behind a demo login (`admin` / `admin123`, shown on screen). Lets admins:
-- Report new potholes on behalf of citizens (same form pattern as the Citizen Portal)
+### 4. Admin Console (`admindashboard.html`)
+Lets admins:
 - View/edit full report details (title, description, severity, road type) in a modal
 - Update status, add internal admin notes, reject or delete a report
 - Search, filter (status/severity), and sort (Newest / Most Upvoted / Severity)
-- Export the current filtered list as CSV
 - View analytics: reports by severity (bar), by status (doughnut), and a 7-day trend (line) — built with Chart.js
 
 *Jira: SCRUM-27, subtasks SCRUM-29 (report list UI), SCRUM-30 (status controls), SCRUM-31 (search/filter)*
 
 ### 5. Hotspot Map (`pothole2.html`)
-Built by a teammate — geo-clustered map view showing where reports concentrate. Not detailed here since it's owned by another contributor.
+Geo-clustered map view showing where reports concentrate where users can see reported incidents and view details of the incident as well as upvote then and there in the module itself..
 
 *Jira: SCRUM-16*
 
@@ -110,37 +103,7 @@ SCRUM-16 add map clustering module
 
 ---
 
-## Backend Integration TODO
-
-Everything above works today using **mock, in-memory data** — no server, no database. This is intentional so the frontend could be built and demoed while the backend is developed separately. Here's exactly what needs to change once it's ready:
-
-### 1. Replace the mock data source
-Every page currently loads a local script that provides a `reports` array in memory. That line needs to change from reading a local array to fetching from the real API, e.g.:
-```js
-// Before (mock):
-let reports = PIRM_REPORTS;
-
-// After (real backend):
-let reports = await fetch('/api/reports').then(r => r.json());
-```
-
-### 2. Keep the data shape identical
-The backend's API responses must return objects with **exactly these fields** (same names, same casing) so the existing frontend code doesn't need to change beyond the fetch call itself:
-```
-id          string   e.g. "PIRM-101"
-title       string
-description string
-severity    string   one of: Low, Medium, High, Critical
-roadType    string   one of: Highway, Main Road, Residential Street, Service Lane
-status      string   one of: Reported, Acknowledged, Fixed
-rejected    boolean
-location    string   "lat, lng" or free-text address
-upvotes     number
-date        string
-photo       string or null   (URL or data reference to the stored image)
-notes       string   (admin-only)
-coords      { lat: number, lng: number } or null   (for the map module)
-```
+## Backend Integration using MySQL
 
 ### 3. Make actions persist
 Currently these all only update the in-memory array and are lost on refresh. Each needs a matching API call:
